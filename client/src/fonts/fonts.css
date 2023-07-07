@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'rob';
+    src: url('../../src/fonts/roboto/Roboto-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'lato';
+    src: url('../../src/fonts/lato/Lato-Regular.ttf');
+}
+@font-face {
+    font-family: 'lato-lt';
+    src: url('../../src/fonts/lato/Lato-Light.ttf');
+}
+
+@font-face {
+    font-family: 'com';
+    src: url('../../src/fonts/comfortaa/Comfortaa-Regular.ttf');
+}

@@ -1,0 +1,43 @@
+@use '../../../mixin.scss' as mixin;
+
+.wrapper {
+    background-color: mixin.$main-color;
+    font-family: 'rob';
+
+    .container {
+        display: flex;
+        justify-content: right;
+    }
+
+    .list {
+        display: flex;
+        justify-content: right;
+        list-style: none;
+        padding: 4px 0;
+
+        li {
+            display: inline-block;
+            padding: 0 11.2px;
+            border-right: 1px solid #82b987;
+
+            &:first-child {
+                padding-left: 0;
+            }
+            &:last-child {
+                padding-right: 0;
+                border: none;
+            }
+
+            a {
+                text-decoration: none;
+                color: #e4f0e6;
+                font-size: 12.8px;
+
+                &:hover {
+                    color: #fff;
+                    transition: all 0.3s;
+                }
+            }
+        }
+    }
+}
