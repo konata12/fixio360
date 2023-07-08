@@ -1,5 +1,6 @@
 // LIBRIARIES
 import express from 'express'
+import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
 import { validationResult } from 'express-validator'
@@ -8,7 +9,9 @@ import { validationResult } from 'express-validator'
 import { registerValidation } from './validations/auth.js'
 
 // MODELS
-import { UserModel } from './models/User.js'
+import UserModel from './models/User.js'
+
+// console.log(UserModel)
 
 // MONGODB CONNECTION
 mongoose.connect('mongodb+srv://dima:maxloh14@fixio360.bh4v0ft.mongodb.net/?retryWrites=true&w=majority')
@@ -29,19 +32,29 @@ app.get('/', (req, res) => {
 });
 
 // REGISTRASTION
-app.post('/auth/register', registerValidation, (req, res) => {
+app.post('/auth/register', registerValidation, async (req, res) => {
     const errors = validationResult(req)
     if(!errors.isEmpty()) {
         return res.status(400).json(errors.array())
     }
 
+    // ENCRYPTING THE PASSWORD RECEIVED BY REQUEST
+    const password = req.body.password
+    const salt = await bcrypt.genSalt(10)
+    const passwordHash = await bcrypt.hash(password, salt)
+
+    // CREATING USER OBJECT
     const doc = new UserModel({
-        
+        email: req.body.email,
+        fullName: req.body.fullName,
+        avatarUrl: req.body.avatarUrl,
+        passwordHash,
     })
 
-    res.json({
-        success: true
-    })
+    //CREATING USER AND SAVING INTO DATABASE
+    const user = await doc.save()
+
+    res.json(user)
 })
 
 //LISTENING FOR REQUESTS FROM PORT 5000
