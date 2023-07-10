@@ -1,20 +1,20 @@
 // LIBRIARIES
 import express from 'express'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
-import { validationResult } from 'express-validator'
 
 //IMPORTS
-import { registerValidation } from './validations/auth.js'
+import { registerValidation, loginValidation } from './validations/validation.js'
 
-// MODELS
-import UserModel from './models/User.js'
+// CONTROLLERS
+import * as UserController from './controllers/userController.js'
+
+// MIDDLEWARE
+import checkAuth from './utils/checkAuth.js'
 
 // console.log(UserModel)
 
 // MONGODB CONNECTION
-mongoose.connect('mongodb+srv://dima:maxloh14@fixio360.bh4v0ft.mongodb.net/?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://dima:maxloh14@fixio360.bh4v0ft.mongodb.net/blog?retryWrites=true&w=majority')
     .then(() => {
         console.log('DB ok')
     })
@@ -31,31 +31,12 @@ app.get('/', (req, res) => {
     res.send('hello');
 });
 
-// REGISTRASTION
-app.post('/auth/register', registerValidation, async (req, res) => {
-    const errors = validationResult(req)
-    if(!errors.isEmpty()) {
-        return res.status(400).json(errors.array())
-    }
-
-    // ENCRYPTING THE PASSWORD RECEIVED BY REQUEST
-    const password = req.body.password
-    const salt = await bcrypt.genSalt(10)
-    const passwordHash = await bcrypt.hash(password, salt)
-
-    // CREATING USER OBJECT
-    const doc = new UserModel({
-        email: req.body.email,
-        fullName: req.body.fullName,
-        avatarUrl: req.body.avatarUrl,
-        passwordHash,
-    })
-
-    //CREATING USER AND SAVING INTO DATABASE
-    const user = await doc.save()
-
-    res.json(user)
-})
+// USER AUTHORISATION
+app.post('/auth/login', loginValidation, UserController.login)
+// USER REGISTRASTION
+app.post('/auth/register', registerValidation, UserController.register)
+// GET USER INFORMATION
+app.get('/auth/me', checkAuth, UserController.getMe)
 
 //LISTENING FOR REQUESTS FROM PORT 5000
 app.listen(5000, (err) => {
