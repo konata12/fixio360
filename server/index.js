@@ -8,12 +8,10 @@ import mongoose from 'mongoose'
 import { registerValidation, loginValidation, postCreateValidation } from './validations/validation.js'
 
 // CONTROLLERS
-import * as UserController from './controllers/userController.js'
-import * as PostController from './controllers/postController.js'
+import { UserController, PostController } from './controllers/index.js'
 
 // MIDDLEWARE
-import checkAuth from './utils/checkAuth.js'
-import handleValidationErrors from './utils/handleValidationErrors.js'
+import { checkAuth, handleValidationErrors } from './utils/index.js'
 
 // console.log(UserModel)
 
@@ -49,12 +47,13 @@ app.use(express.json())
 app.use('/uploads', express.static('uploads'))
 
 // USER AUTHORISATION
-app.post('/auth/login', handleValidationErrors, loginValidation, UserController.login)
+app.post('/auth/login', loginValidation, handleValidationErrors, UserController.login)
 // USER REGISTRASTION
-app.post('/auth/register', handleValidationErrors, registerValidation, UserController.register)
+app.post('/auth/register', registerValidation, handleValidationErrors, UserController.register)
 // GET USER INFORMATION
 app.get('/auth/me', checkAuth, UserController.getMe)
 
+// POST IMAGE
 app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
     res.json({
         url: `/uploads/${req.file.originalname}`
@@ -64,9 +63,9 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
 // BLOG
 app.get('/posts', PostController.getAll)
 app.get('/posts/:id', PostController.getOne)
-app.post('/posts', checkAuth, postCreateValidation, PostController.create)
+app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, PostController.create)
 app.delete('/posts/:id', checkAuth, PostController.remove)
-app.patch('/posts/:id', checkAuth, postCreateValidation, PostController.update)
+app.patch('/posts/:id', checkAuth, postCreateValidation, handleValidationErrors, PostController.update)
 
 
 
