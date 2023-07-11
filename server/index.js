@@ -1,5 +1,7 @@
 // LIBRIARIES
 import express from 'express'
+import multer from 'multer'
+
 import mongoose from 'mongoose'
 
 //IMPORTS
@@ -11,6 +13,7 @@ import * as PostController from './controllers/postController.js'
 
 // MIDDLEWARE
 import checkAuth from './utils/checkAuth.js'
+import handleValidationErrors from './utils/handleValidationErrors.js'
 
 // console.log(UserModel)
 
@@ -26,25 +29,44 @@ mongoose.connect('mongodb+srv://dima:maxloh14@fixio360.bh4v0ft.mongodb.net/blog?
 // CREATING EXPRESS APP
 const app = express();
 
-app.use(express.json())
+// STORAGE FOR IMAGES IN SERVER
+const storage = multer.diskStorage({
+    destination: (_, __, cb) => {
+        // RETURN NO ERRORS AND SAVE IMAGES INTO UPLOADS FOLDER
+        cb(null, 'uploads')
+    },
+    // NAMING OUR FILE
+    filename: (_, file, cb) => {
+        // RETURN NO ERRORS AND GET ORIGINAL NAME
+        cb(null, file.originalname)
+    },
+})
 
-app.get('/', (req, res) => {
-    res.send('hello');
-});
+const upload = multer({ storage })
+
+app.use(express.json())
+// MAKE EXPRESS UNDERSTAND THAT FROM UPLOADS URL I NEED IMAGE, NOT ROUTE
+app.use('/uploads', express.static('uploads'))
 
 // USER AUTHORISATION
-app.post('/auth/login', loginValidation, UserController.login)
+app.post('/auth/login', handleValidationErrors, loginValidation, UserController.login)
 // USER REGISTRASTION
-app.post('/auth/register', registerValidation, UserController.register)
+app.post('/auth/register', handleValidationErrors, registerValidation, UserController.register)
 // GET USER INFORMATION
 app.get('/auth/me', checkAuth, UserController.getMe)
+
+app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
+    res.json({
+        url: `/uploads/${req.file.originalname}`
+    })
+})
 
 // BLOG
 app.get('/posts', PostController.getAll)
 app.get('/posts/:id', PostController.getOne)
 app.post('/posts', checkAuth, postCreateValidation, PostController.create)
-// app.delete('/posts', UserController.remove)
-// app.patch('/posts', UserController.update)
+app.delete('/posts/:id', checkAuth, PostController.remove)
+app.patch('/posts/:id', checkAuth, postCreateValidation, PostController.update)
 
 
 

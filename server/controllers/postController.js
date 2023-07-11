@@ -20,7 +20,7 @@ export const getOne = async (req, res) => {
         // GET POST ID
         const postId = req.params.id
         
-        PostModel.findOneAndUpdate(
+        await PostModel.findOneAndUpdate(
             {
                 _id: postId
             },
@@ -30,47 +30,52 @@ export const getOne = async (req, res) => {
             {
                 returnDocument: 'after'
             },
-            // (err, doc) => {
-            //     if (err) {
-            //         console.log(err)
-            //         // LETTING USER KNOW ABOUT GET PROBLEM
-            //         return res.status(500).json({
-            //         message: 'Не вдалось получити статті'
-            //         })
-            //     }
-
-            //     if (!doc) {
-            //         return res.status(404).json({
-            //             message: 'Стаття не знайдена'
-            //         })
-            //     }
-
-            //     res.json(doc)
-            // }
-        ).then((err, doc) => {
-            if (err) {
-                console.log(err)
-                // LETTING USER KNOW ABOUT GET PROBLEM
-                return res.status(500).json({
-                message: 'Не вдалось получити статті'
-                })
-            }
-
-            if (!doc) {
+        ).then((result) => {
+            if (!result) {
                 return res.status(404).json({
                     message: 'Стаття не знайдена'
                 })
             }
-
-            res.json(doc)
+            
+            res.json(result)
         })
-
-        // res.json(doc)
     } catch (err) {
         console.log(err)
         // LETTING USER KNOW ABOUT GET PROBLEM
         res.status(500).json({
             message: 'Не вдалось получити статтю'
+        })
+    }
+}
+
+export const remove = async (req, res) => {
+    try {
+        // GET POST ID
+        const postId = req.params.id
+        
+        await PostModel.findByIdAndDelete({
+            _id: postId
+        }).then((result) => {
+            if (!result) {
+                return res.status(404).json({
+                    message: 'Стаття не знайдена'
+                })
+            }
+            
+            res.json({
+                success: true
+            })
+        }).catch((err) => {
+            console.log(err)
+            return res.status(500).json({
+                message: 'Не вдалось видалити статтю'
+            })
+        })
+    } catch (err) {
+        console.log(err)
+        // LETTING USER KNOW ABOUT GET PROBLEM
+        res.status(500).json({
+            message: 'Помилка при видаленні статті'
         })
     }
 }
@@ -94,6 +99,35 @@ export const create = async(req, res) => {
         // LETTING USER KNOW ABOUT POST PROBLEM
         res.status(500).json({
             message: 'Не вдалось створити статтю'
+        })
+    }
+}
+
+export const update = async (req, res) => {
+    try {
+        const postId = req.params.id
+
+        await PostModel.updateOne(
+            {
+                _id: postId
+            },
+            {
+                title: req.body.title,
+                text: req.body.text,
+                imageUrl: req.body.imageUrl,
+                tags: req.body.tags,
+                user: req.userId
+            }
+        )
+
+        res.json({
+            success: true
+        })
+    } catch (err) {
+        console.log(err)
+        // LETTING USER KNOW ABOUT UPDATE PROBLEM
+        res.status(500).json({
+            message: 'Не вдалось оновити статтю'
         })
     }
 }
