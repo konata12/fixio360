@@ -4,7 +4,7 @@ import { Navbar } from './Navbar'
 export const Layout = ({ children }) => {
     return (
         <React.Fragment>
-            <div className="container">
+            <div className="container m-auto">
                 <Navbar />
                 { children }
             </div>
