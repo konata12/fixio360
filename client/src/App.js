@@ -12,6 +12,8 @@ import { EditPostPage } from './pages/EditPostPage.jsx'
 
 // LIBRIARIES
 import { Routes, Route } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 
 function App() {
@@ -26,6 +28,8 @@ function App() {
         <Route path='register' element={<RegisterPage />} />
         <Route path='login' element={<LoginPage />} />
       </Routes>
+
+      <ToastContainer position='bottom-right' />
     </Layout>
   );
 }
