@@ -8,7 +8,6 @@ export const RegisterPage = () => {
     const [userName, setUserName] = useState('')
     const [password, setPassword] = useState('')
     const {status} = useSelector(state => state.auth)
-    console.log(status)
     const dispatch = useDispatch()
 
     useEffect(() => {

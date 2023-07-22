@@ -12,6 +12,7 @@ export const registerUser = createAsyncThunk(
     'auth/registerUser',
     async ({ userName, password }) => {
         try {
+            // SERVER RESPONSE
             const { data } = await axios.post('/auth/register', {
                 userName,
                 password
@@ -44,7 +45,7 @@ export const authSlice = createSlice({
             state.token = action.payload.token
         },
         [registerUser.rejected]: (state, action) => {
-            state.status = action.payload?.message
+            state.status = action.payload.message
             state.isLoading = false
         },
     }
