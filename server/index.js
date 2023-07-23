@@ -6,6 +6,7 @@ import cors from "cors";
 
 // IMPORT ROUTES
 import authRoute from "./routes/auth.js";
+import postRoute from "./routes/posts.js";
 
 
 const app = express()
@@ -23,6 +24,7 @@ app.use(express.json())
 
 // ROUTES
 app.use('/api/auth', authRoute)
+app.use('/api/posts', postRoute)
 
 const start = async () => {
     try {
