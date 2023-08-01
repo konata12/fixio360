@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 // CREATE POST
 export const createPost = async (req, res) => {
     try {
+        console.log(req.files.image.name)
         console.log(req.body)
         const { title, text } = req.body
         const user = await User.findById(req.userId)
@@ -16,7 +17,7 @@ export const createPost = async (req, res) => {
             // GET CURRENT FOLDER PATH (CONTROLLERS FOLDER)
             const __dirname = dirname(fileURLToPath(import.meta.url))
             // MOVE IMG INTO UPLOADS AND GIVE IT NEW NAME
-            req.files.image.mv(path.loin(__dirname, '..', 'uploads', fileName))
+            req.files.image.mv(path.join(__dirname, '..', 'uploads', fileName))
 
             const newPostWithImage = new Post({
                 userName: user.userName,

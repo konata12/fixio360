@@ -15,14 +15,8 @@ export const AddPostPage = () => {
             data.append('title', title)
             data.append('text', text)
             data.append('image', image)
-
-            console.log(data)
-            const file = {
-                title: title,
-                text: text,
-                image: image,
-            }
-            dispatch(createPost(file))
+            
+            dispatch(createPost(data))
         } catch (err) {
             console.log(err)
         }
@@ -40,7 +34,7 @@ export const AddPostPage = () => {
                 <input
                     type="file"
                     className='hidden'
-                    onChange={e => setImage(e.target.files[0])}
+                    onChange={(e) => setImage(e.target.files[0])}
                 />
             </label>
             <div className='flex object-cover py-2'> IMAGE</div>
