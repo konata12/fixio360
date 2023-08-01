@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 // CREATE POST
 export const createPost = async (req, res) => {
     try {
+        console.log(req.body)
         const { title, text } = req.body
         const user = await User.findById(req.userId)
 

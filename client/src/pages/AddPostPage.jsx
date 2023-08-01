@@ -37,7 +37,11 @@ export const AddPostPage = () => {
                 className='text-gray-300 py-2 bg-gray-600 text-xs mt-2 flex items-center justify-center border-2 border-dotted cursor-pointer'
             >
                 Прикріпити зображення:
-                <input type="file" className='hidden' onChange={e => setImage(e.target.files[0])} />
+                <input
+                    type="file"
+                    className='hidden'
+                    onChange={e => setImage(e.target.files[0])}
+                />
             </label>
             <div className='flex object-cover py-2'> IMAGE</div>
 
@@ -48,7 +52,7 @@ export const AddPostPage = () => {
                 <input
                     type="text"
                     value={title}
-                    onChange={e => setTitle(e.target.value)}
+                    onChange={(e) => setTitle(e.target.value)}
                     placeholder='Title'
                     className='mt-1 text-black w-full rounded-lg bg-gray-400 border py-1 px-2 text-xs outline-none placeholder:text-gray-700'
                 />
@@ -60,7 +64,7 @@ export const AddPostPage = () => {
                 Текст посту:
                 <textarea
                     value={text}
-                    onChange={e => setText(e.target.value)}
+                    onChange={(e) => setText(e.target.value)}
                     placeholder='Main text'
                     className='mt-1 text-black w-full rounded-lg bg-red-400 border py-1 px-2 text-xs outline-none resize-none h-40 placeholder:text-gray-700'
                 ></textarea>

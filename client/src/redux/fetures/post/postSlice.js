@@ -9,7 +9,7 @@ const initialState = {
 
 export const createPost = createAsyncThunk('post/createPost', async (params) => {
     try {
-        const { data } = await Axios.post('/posts')
+        const { data } = await Axios.post('/posts', params)
 
         return data
     } catch (err) {
