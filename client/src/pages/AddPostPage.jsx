@@ -1,13 +1,17 @@
-import React, { useState } from 'react'
-import {useDispatch} from 'react-redux'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { createPost } from '../redux/fetures/post/postSlice'
+import { toast } from 'react-toastify'
 
 export const AddPostPage = () => {
     const [title, setTitle] = useState('')
     const [text, setText] = useState('')
     const [image, setImage] = useState('')
 
+    const { status } = useSelector(state => state.auth)
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const submitHandler = () => {
         try {
@@ -15,12 +19,23 @@ export const AddPostPage = () => {
             data.append('title', title)
             data.append('text', text)
             data.append('image', image)
-            
+
             dispatch(createPost(data))
+            navigate('/')
         } catch (err) {
             console.log(err)
         }
     }
+
+    const clearFormHandler = () => {
+        setText('')
+        setTitle('')
+    }
+
+    // useEffect(() => {
+    //     console.log(status)
+    //     if (status) toast(status)
+    // }, [])
 
     return (
         <form
@@ -37,7 +52,11 @@ export const AddPostPage = () => {
                     onChange={(e) => setImage(e.target.files[0])}
                 />
             </label>
-            <div className='flex object-cover py-2'> IMAGE</div>
+            <div className='flex object-cover py-2'>
+                {image && (
+                    <img src={URL.createObjectURL(image)} alt="image" />
+                )}
+            </div>
 
             <label
                 className="text-xs text-white opacity-70"
@@ -74,6 +93,7 @@ export const AddPostPage = () => {
 
                 <button
                     className="flex items-center justify-center bg-red-500 text-xs text-white rounded-sm py-2 px-4"
+                    onClick={clearFormHandler}
                 >
                     Відмінити
                 </button>

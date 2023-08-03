@@ -30,7 +30,10 @@ export const createPost = async (req, res) => {
                 $push: { posts: newPostWithImage }
             })
 
-            return res.json(newPostWithImage)
+            return res.json({
+                newPostWithImage,
+                message: 'Created post with image'
+            })
         }
 
         // CREATE POST WITHOUT IMG
@@ -52,6 +55,29 @@ export const createPost = async (req, res) => {
     } catch (err) {
         res.json({
             message: 'Щось пішло не так при створенні поста'
+        })
+    }
+}
+
+// GET ALL POSTS
+export const getAll = async (req, res) => {
+    try {
+        const posts = await Post.find().sort('-createdAt')
+        const popularPosts = await Post.find().limit(5).sort('-views')
+
+        if (!posts) {
+            return res.json({
+                message: 'There are no posts'
+            })
+        }
+
+        res.json({
+            posts,
+            popularPosts
+        })
+    } catch (err) {
+        res.json({
+            message: 'Something gone wrong'
         })
     }
 }
