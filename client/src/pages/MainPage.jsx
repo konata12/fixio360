@@ -16,7 +16,7 @@ export const MainPage = () => {
     if (!posts.lenght) {
         return (
             <div className="text-xl text-center text-white py-10">
-                There sre no posts
+                There are no posts
             </div>
         )
     }
@@ -25,10 +25,12 @@ export const MainPage = () => {
         <div className='max-w-[900px] mx-auto py-10'>
             <div className="flex justify-between gap-8">
                 <div className="flex flex-col gap-10 basis-4/5">
-                    <PostItem />
-                    <PostItem />
-                    <PostItem />
-                    <PostItem />
+
+                    {
+                        posts?.map((post, i) => (
+                            <PostItem key={i} post={post} />
+                        ))
+                    }
                 </div>
                 <div className="basis-1/5">
                     <div className='text-xs uppercase text-white'>
@@ -36,9 +38,9 @@ export const MainPage = () => {
                     </div>
 
                     {
-                        popularPosts?.map((post, index) => {
+                        popularPosts?.map((post, index) => (
                             <PopularPosts key={index} post={post} />
-                        })
+                        ))
                     }
                 </div>
             </div>

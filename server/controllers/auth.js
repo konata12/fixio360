@@ -3,10 +3,12 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 // REGISTER USER
-export const register = async (req,res) => {
+export const register = async (req, res) => {
     try {
         const { userName, password } = req.body
         const isUsed = await User.findOne({ userName })
+
+        console.log(isUsed)
 
         // CHECKING IS USER NAME IS USED
         if(isUsed) {
@@ -51,10 +53,11 @@ export const register = async (req,res) => {
 }
 
 // LOGIN USER
-export const login = async (req,res) => {
+export const login = async (req, res) => {
     try {
         const { userName, password } = req.body
         const user = await User.findOne({ userName })
+        console.log(user)
 
         if  (!user) {
             return res.json({
@@ -94,7 +97,7 @@ export const login = async (req,res) => {
 }
 
 // GET ME
-export const getMe = async (req,res) => {
+export const getMe = async (req, res) => {
     try {
         const user = await User.findById(req.userId)
 
