@@ -21,7 +21,6 @@ export const createPost = createAsyncThunk('post/createPost', async (params) => 
 export const getAllPosts = createAsyncThunk('post/getAllPosts', async () => {
     try {
         const { data } = await Axios.get('/posts')
-        console.log(data)
         return data
     } catch (err) {
         console.log(err)
@@ -57,11 +56,9 @@ export const postSlice = createSlice({
             state.loading = false
             state.posts = action.payload.posts
             state.popularPosts = action.payload.popularPosts
-            state.status = action.payload.message
         },
         [getAllPosts.rejected]: (state, action) => {
             state.loading = false
-            state.status = action.payload.message
         },
     }
 })

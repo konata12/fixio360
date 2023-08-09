@@ -31,8 +31,7 @@ export const createPost = async (req, res) => {
             })
 
             return res.json({
-                newPostWithImage,
-                message: 'Created post with image'
+                newPostWithImage
             })
         }
 
@@ -71,10 +70,27 @@ export const getAll = async (req, res) => {
             })
         }
 
+        console.log(posts)
+
         res.json({
             posts,
             popularPosts
         })
+    } catch (err) {
+        res.json({
+            message: 'Something gone wrong'
+        })
+    }
+}
+
+// GET POST BY ID
+export const getById = async (req, res) => {
+    try {
+        const post = await Post.findByIdAndUpdate(req.params.id, {
+            $inc: { views: 1 }
+        })
+
+        res.json(post)
     } catch (err) {
         res.json({
             message: 'Something gone wrong'
