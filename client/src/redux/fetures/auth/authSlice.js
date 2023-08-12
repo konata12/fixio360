@@ -45,6 +45,8 @@ export const loginUser = createAsyncThunk(
                 window.localStorage.setItem('token', data.token)
             }
 
+            console.log(data)
+
             return data
         } catch (err) {
             console.log(err)
@@ -56,8 +58,6 @@ export const getMe = createAsyncThunk('auth/get', async () => {
         try {
             // SERVER RESPONSE
             const { data } = await Axios.get('/auth/me')
-
-            console.log(data)
 
             return data
         } catch (err) {
@@ -119,8 +119,8 @@ export const authSlice = createSlice({
         [getMe.fulfilled]: (state, action) => {
             state.isLoading = false
             state.status = null
-            state.user = action.payload?.user
-            state.token = action.payload?.token
+            state.user = action.payload.user
+            state.token = action.payload.token
         },
         [getMe.rejected]: (state, action) => {
             state.status = action.payload.message
@@ -129,7 +129,7 @@ export const authSlice = createSlice({
     }
 })
 
-export const checkIsAuth = state => Boolean(state.auth.token)
+export const checkIsAuth = (state) => Boolean(state.auth.token)
 
-export const  {logout} = authSlice.actions
+export const { logout } = authSlice.actions
 export default authSlice.reducer

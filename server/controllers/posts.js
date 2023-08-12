@@ -2,6 +2,8 @@ import Post from "../models/Post.js";
 import User from "../models/User.js";
 import path, { dirname } from 'path';
 import { fileURLToPath } from "url";
+import * as fs from 'fs';
+import { unlink } from 'node:fs';
 
 // CREATE POST
 export const createPost = async (req, res) => {
@@ -70,8 +72,6 @@ export const getAll = async (req, res) => {
             })
         }
 
-        console.log(posts)
-
         res.json({
             posts,
             popularPosts
@@ -91,6 +91,48 @@ export const getById = async (req, res) => {
         })
 
         res.json(post)
+    } catch (err) {
+        res.json({
+            message: 'Something gone wrong'
+        })
+    }
+}
+
+// DELETE POST BY ID
+export const deleteMyPost = async (req, res) => {
+    try {
+        // DELETE POSTS FROM MONGO
+        const post = await Post.findByIdAndRemove(req.params.id)
+        if (!post) return res.join({
+            message: 'There are no such a post'
+        })
+
+        // DELETE POST FROM MONGO USER'S POSTS
+        await User.findByIdAndUpdate(req.userId, {
+            $pull: { posts: req.params.id }
+        })
+
+        // DELETE IMG FROM UPLOADS
+        let fileName = post.imgUrl
+        fs.unlinkSync('./uploads/' + fileName)
+
+        res.json({
+            message: 'Post was deleted'
+        })
+    } catch (err) {
+        res.json({
+            message: 'Something gone wrong'
+        })
+    }
+}
+
+// GET USER POSTS
+export const getMyPosts = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId)
+        const userPosts = await Post.find({ _id: { $in: user.posts } })
+
+        res.json(userPosts)
     } catch (err) {
         res.json({
             message: 'Something gone wrong'

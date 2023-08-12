@@ -27,6 +27,15 @@ export const getAllPosts = createAsyncThunk('post/getAllPosts', async () => {
     }
 })
 
+export const getMyPosts = createAsyncThunk('post/getMyPosts', async () => {
+    try {
+        const { data } = await Axios.get('/posts/user/me')
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+})
+
 export const postSlice = createSlice({
     name: 'post',
     initialState,
