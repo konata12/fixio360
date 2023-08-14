@@ -3,7 +3,6 @@ import User from "../models/User.js";
 import path, { dirname } from 'path';
 import { fileURLToPath } from "url";
 import * as fs from 'fs';
-import { unlink } from 'node:fs';
 
 // CREATE POST
 export const createPost = async (req, res) => {
@@ -16,6 +15,11 @@ export const createPost = async (req, res) => {
             let fileName = Date.now().toString() + req.files.image.name
             // GET CURRENT FOLDER PATH (CONTROLLERS FOLDER)
             const __dirname = dirname(fileURLToPath(import.meta.url))
+            // CHECKING IF THERE AREN'T SUCH A DIRECTORY, THEN CREATE
+            if (!fs.existsSync('./uploads')) {
+                fs.mkdirSync('./uploads')
+            }
+
             // MOVE IMG INTO UPLOADS AND GIVE IT NEW NAME
             req.files.image.mv(path.join(__dirname, '..', 'uploads', fileName))
 
@@ -94,6 +98,88 @@ export const getById = async (req, res) => {
     } catch (err) {
         res.json({
             message: 'Something gone wrong'
+        })
+    }
+}
+
+// UPDATE POST
+export const updatePost = async (req, res) => {
+    try {
+        console.log(req.body)
+        const { title, text } = req.body
+        const user = await User.findById(req.userId)
+        console.log(1)
+        console.log(req.files)
+
+        // CREATE POST WITH IMG
+        if (req.files) {
+            console.log(2)
+            let fileName = Date.now().toString() + req.files.image.name
+
+            // GET CURRENT FOLDER PATH (CONTROLLERS FOLDER)
+            const __dirname = dirname(fileURLToPath(import.meta.url))
+
+            // CHECKING IF THERE AREN'T SUCH A DIRECTORY, THEN CREATE
+            if (!fs.existsSync('./uploads')) {
+                fs.mkdirSync('./uploads')
+            }
+            console.log(3)
+
+            // DELETE OLD IMG FROM UPLOADS
+            const oldImg = await Post.findById(req.params.id)
+            const oldImgUrl = oldImg.imgUrl
+            console.log(oldImgUrl)
+            fs.unlinkSync('./uploads/' + oldImgUrl)
+            console.log(4)
+
+            // MOVE IMG INTO UPLOADS AND GIVE IT NEW NAME
+            req.files.image.mv(path.join(__dirname, '..', 'uploads', fileName))
+            console.log(5)
+
+            const updatedPostWithImage = Post.findByIdAndUpdate(req.params.id,
+                {
+                    title
+                },
+                // {
+                //     text
+                // },
+                // {
+                //     imgUrl: fileName,
+                // }
+            )
+            console.log(6)
+
+            await User.findByIdAndUpdate(req.userId, {
+                $push: { posts: updatedPostWithImage }
+            })
+
+            return res.json({
+                updatedPostWithImage
+            })
+        }
+
+        // CREATE POST WITHOUT IMG
+        const updatedPostWithoutImage = Post.findByIdAndUpdate(
+            {
+                title
+            },
+            {
+                text
+            },
+            {
+                imgUrl: '',
+            }
+        )
+
+        await User.findByIdAndUpdate(req.userId, {
+            $push: { posts: updatedPostWithoutImage }
+        })
+
+        res.json(updatedPostWithoutImage)
+
+    } catch (err) {
+        res.json({
+            message: 'Щось пішло не так при оновлені поста'
         })
     }
 }

@@ -18,6 +18,16 @@ export const createPost = createAsyncThunk('post/createPost', async (params) => 
     }
 })
 
+export const editPost = createAsyncThunk('post/editPost', async ({ params, id }) => {
+    try {
+        const { data } = await Axios.put(`/posts/${id}`, params)
+
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+})
+
 export const getAllPosts = createAsyncThunk('post/getAllPosts', async () => {
     try {
         const { data } = await Axios.get('/posts')
@@ -42,6 +52,21 @@ export const postSlice = createSlice({
     reducers: {},
     extraReducers: {
         // CREATE POST
+        [createPost.pending]: (state, action) => {
+            state.loading = true
+            state.status = null
+        },
+        [createPost.fulfilled]: (state, action) => {
+            state.loading = false
+            state.posts.push(action.payload)
+            state.status = action.payload.message
+        },
+        [createPost.rejected]: (state, action) => {
+            state.loading = false
+            state.status = action.payload.message
+        },
+
+        // EDIT POST
         [createPost.pending]: (state, action) => {
             state.loading = true
             state.status = null

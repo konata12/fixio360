@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { createPost } from '../redux/fetures/post/postSlice'
-import { toast } from 'react-toastify'
+// import { toast } from 'react-toastify'
 
 export const AddPostPage = () => {
     const [title, setTitle] = useState('')
     const [text, setText] = useState('')
     const [image, setImage] = useState('')
 
-    const { status } = useSelector(state => state.auth)
+    // const { status } = useSelector(state => state.auth)
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -31,11 +31,6 @@ export const AddPostPage = () => {
         setText('')
         setTitle('')
     }
-
-    // useEffect(() => {
-    //     console.log(status)
-    //     if (status) toast(status)
-    // }, [])
 
     return (
         <form
