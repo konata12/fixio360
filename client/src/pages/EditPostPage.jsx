@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { editPost } from '../redux/fetures/post/postSlice'
+import Axios from '../utils/axios.js'
 
 export const EditPostPage = () => {
     const [title, setTitle] = useState('')
     const [text, setText] = useState('')
-    const [image, setImage] = useState('')
+    const [newImage, setNewImage] = useState('')
+    const [oldImage, setOldImage] = useState('')
     const params = useParams()
     const id = params.id
 
@@ -14,12 +16,19 @@ export const EditPostPage = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
+    const fetchPost = useCallback(async () => {
+        const { data } = await Axios.get(`/posts/${params.id}`)
+        setTitle(data.title)
+        setText(data.text)
+        setOldImage(data.imgUrl)
+    }, [params.id])
+
     const submitHandler = () => {
         try {
             const params = new FormData()
             params.append('title', title)
             params.append('text', text)
-            params.append('image', image)
+            params.append('image', newImage)
 
             dispatch(editPost({ params, id }))
             navigate('/')
@@ -33,6 +42,10 @@ export const EditPostPage = () => {
         setTitle('')
     }
 
+    useEffect(() => {
+        fetchPost()
+    }, [fetchPost])
+
     return (
         <form
             className='w-1/3 mx-auto py-10'
@@ -45,12 +58,19 @@ export const EditPostPage = () => {
                 <input
                     type="file"
                     className='hidden'
-                    onChange={(e) => setImage(e.target.files[0])}
+                    onChange={(e) => {
+                        setNewImage(e.target.files[0])
+                        setOldImage('')
+                    }}
                 />
             </label>
             <div className='flex object-cover py-2'>
-                {image && (
-                    <img src={URL.createObjectURL(image)} alt={image.name} />
+                {oldImage && (
+                    <img src={`http://localhost:3002/${oldImage}`} alt={oldImage.name} />
+                )}
+
+                {newImage && (
+                    <img src={URL.createObjectURL(newImage)} alt={newImage.name} />
                 )}
             </div>
 

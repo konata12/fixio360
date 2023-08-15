@@ -67,16 +67,17 @@ export const postSlice = createSlice({
         },
 
         // EDIT POST
-        [createPost.pending]: (state, action) => {
+        [editPost.pending]: (state, action) => {
             state.loading = true
             state.status = null
         },
-        [createPost.fulfilled]: (state, action) => {
+        [editPost.fulfilled]: (state, action) => {
             state.loading = false
-            state.posts.push(action.payload)
+            const index = state.posts.findIndex(post => post._id === action.payload._id)
+            state.posts[index] = action.payload
             state.status = action.payload.message
         },
-        [createPost.rejected]: (state, action) => {
+        [editPost.rejected]: (state, action) => {
             state.loading = false
             state.status = action.payload.message
         },

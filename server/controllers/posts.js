@@ -105,16 +105,12 @@ export const getById = async (req, res) => {
 // UPDATE POST
 export const updatePost = async (req, res) => {
     try {
-        console.log(req.body)
         const { title, text } = req.body
-        const user = await User.findById(req.userId)
-        console.log(1)
-        console.log(req.files)
+        const post = await Post.findById(req.params.id)
 
-        // CREATE POST WITH IMG
+        // CHANGE IMG IF THERE IS ONE
         if (req.files) {
-            console.log(2)
-            let fileName = Date.now().toString() + req.files.image.name
+            let newImgName = Date.now().toString() + req.files.image.name
 
             // GET CURRENT FOLDER PATH (CONTROLLERS FOLDER)
             const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -123,60 +119,28 @@ export const updatePost = async (req, res) => {
             if (!fs.existsSync('./uploads')) {
                 fs.mkdirSync('./uploads')
             }
-            console.log(3)
 
             // DELETE OLD IMG FROM UPLOADS
             const oldImg = await Post.findById(req.params.id)
             const oldImgUrl = oldImg.imgUrl
             console.log(oldImgUrl)
-            fs.unlinkSync('./uploads/' + oldImgUrl)
-            console.log(4)
+            if (fs.existsSync('./uploads/' + oldImgUrl)) {
+                fs.unlinkSync('./uploads/' + oldImgUrl)
+            }
 
             // MOVE IMG INTO UPLOADS AND GIVE IT NEW NAME
-            req.files.image.mv(path.join(__dirname, '..', 'uploads', fileName))
-            console.log(5)
+            req.files.image.mv(path.join(__dirname, '..', 'uploads', newImgName))
 
-            const updatedPostWithImage = Post.findByIdAndUpdate(req.params.id,
-                {
-                    title
-                },
-                // {
-                //     text
-                // },
-                // {
-                //     imgUrl: fileName,
-                // }
-            )
-            console.log(6)
-
-            await User.findByIdAndUpdate(req.userId, {
-                $push: { posts: updatedPostWithImage }
-            })
-
-            return res.json({
-                updatedPostWithImage
-            })
+            post.imgUrl = newImgName
         }
 
-        // CREATE POST WITHOUT IMG
-        const updatedPostWithoutImage = Post.findByIdAndUpdate(
-            {
-                title
-            },
-            {
-                text
-            },
-            {
-                imgUrl: '',
-            }
-        )
+        // EDIT STRING VALUES
+        post.title = title
+        post.text = text
 
-        await User.findByIdAndUpdate(req.userId, {
-            $push: { posts: updatedPostWithoutImage }
-        })
+        await post.save()
 
-        res.json(updatedPostWithoutImage)
-
+        res.json(post)
     } catch (err) {
         res.json({
             message: 'Щось пішло не так при оновлені поста'
