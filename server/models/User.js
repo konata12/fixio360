@@ -11,6 +11,10 @@ const UserSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        imgUrl: {
+            type: String,
+            default: ''
+        },
         posts: [{
             type:mongoose.Schema.Types.ObjectId,
             ref: 'Post',

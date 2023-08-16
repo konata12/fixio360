@@ -66,6 +66,17 @@ export const getMe = createAsyncThunk('auth/get', async () => {
     }
 )
 
+export const editMe = createAsyncThunk('auth/get', async (params) => {
+        try {
+            const { data } = await Axios.put('/auth/me', params)
+
+            return data
+        } catch (err) {
+            console.log(err)
+        }
+    }
+)
+
 
 export const authSlice = createSlice({
     name: 'auth',
@@ -102,7 +113,7 @@ export const authSlice = createSlice({
         },
         [loginUser.fulfilled]: (state, action) => {
             state.isLoading = false
-            state.status = action.payload.message
+            state.status = action.payload?.message
             state.user = action.payload.user
             state.token = action.payload.token
         },
@@ -124,6 +135,22 @@ export const authSlice = createSlice({
         },
         [getMe.rejected]: (state, action) => {
             state.status = action.payload.message
+            state.isLoading = false
+        },
+
+        // EDIT USER
+        [editMe.pending]: (state) => {
+            state.isLoading = true
+            state.status = null
+        },
+        [editMe.fulfilled]: (state, action) => {
+            state.isLoading = false
+            state.status = null
+            state.user = action.payload?.user
+            state.token = action.payload?.token
+        },
+        [editMe.rejected]: (state, action) => {
+            state.status = action.payload?.message
             state.isLoading = false
         },
     }

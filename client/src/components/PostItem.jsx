@@ -19,7 +19,7 @@ export const PostItem = ({ post }) => {
                     post.imgUrl ? 'flex rounded-sm h-80' : 'flex rounded-sm'
                 }>
                     {post.imgUrl && (
-                        <img src={`http://localhost:3002/${post.imgUrl}`} alt="img" className='object-cover w-full' />
+                        <img src={`http://localhost:3002/post/${post.imgUrl}`} alt="img" className='object-cover w-full' />
                     )}
                 </div>
                 <div className='flex justify-between items-center pt-2'>

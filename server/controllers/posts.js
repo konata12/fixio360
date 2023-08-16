@@ -16,12 +16,12 @@ export const createPost = async (req, res) => {
             // GET CURRENT FOLDER PATH (CONTROLLERS FOLDER)
             const __dirname = dirname(fileURLToPath(import.meta.url))
             // CHECKING IF THERE AREN'T SUCH A DIRECTORY, THEN CREATE
-            if (!fs.existsSync('./uploads')) {
-                fs.mkdirSync('./uploads')
+            if (!fs.existsSync('./uploads/post')) {
+                fs.mkdirSync('./uploads/post')
             }
 
             // MOVE IMG INTO UPLOADS AND GIVE IT NEW NAME
-            req.files.image.mv(path.join(__dirname, '..', 'uploads', fileName))
+            req.files.image.mv(path.join(__dirname, '..', 'uploads', 'post', fileName))
 
             const newPostWithImage = new Post({
                 userName: user.userName,
@@ -116,20 +116,20 @@ export const updatePost = async (req, res) => {
             const __dirname = dirname(fileURLToPath(import.meta.url))
 
             // CHECKING IF THERE AREN'T SUCH A DIRECTORY, THEN CREATE
-            if (!fs.existsSync('./uploads')) {
-                fs.mkdirSync('./uploads')
+            if (!fs.existsSync('./uploads/post')) {
+                fs.mkdirSync('./uploads/post')
             }
 
             // DELETE OLD IMG FROM UPLOADS
             const oldImg = await Post.findById(req.params.id)
             const oldImgUrl = oldImg.imgUrl
             console.log(oldImgUrl)
-            if (fs.existsSync('./uploads/' + oldImgUrl)) {
-                fs.unlinkSync('./uploads/' + oldImgUrl)
+            if (fs.existsSync('./uploads/post/' + oldImgUrl)) {
+                fs.unlinkSync('./uploads/post/' + oldImgUrl)
             }
 
             // MOVE IMG INTO UPLOADS AND GIVE IT NEW NAME
-            req.files.image.mv(path.join(__dirname, '..', 'uploads', newImgName))
+            req.files.image.mv(path.join(__dirname, '..', 'uploads', 'post', newImgName))
 
             post.imgUrl = newImgName
         }
@@ -164,7 +164,7 @@ export const deleteMyPost = async (req, res) => {
 
         // DELETE IMG FROM UPLOADS
         let fileName = post.imgUrl
-        fs.unlinkSync('./uploads/' + fileName)
+        fs.unlinkSync('./uploads/post/' + fileName)
 
         res.json({
             message: 'Post was deleted'

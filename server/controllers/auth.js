@@ -1,6 +1,9 @@
 import User from '../models/User.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import path, { dirname } from 'path';
+import { fileURLToPath } from "url";
+import * as fs from 'fs';
 
 // REGISTER USER
 export const register = async (req, res) => {
@@ -11,7 +14,7 @@ export const register = async (req, res) => {
         console.log(isUsed)
 
         // CHECKING IS USER NAME IS USED
-        if(isUsed) {
+        if (isUsed) {
             return res.json({
                 message: 'Даний логін занятий'
             })
@@ -29,7 +32,7 @@ export const register = async (req, res) => {
         // CREATING TOKEN
         const token = jwt.sign(
             {
-            id: newUser._id
+                id: newUser._id
             },
             process.env.JWT_SECRET,
             {
@@ -57,9 +60,8 @@ export const login = async (req, res) => {
     try {
         const { userName, password } = req.body
         const user = await User.findOne({ userName })
-        console.log(user)
 
-        if  (!user) {
+        if (!user) {
             return res.json({
                 message: 'Користувача не знайдено'
             })
@@ -75,7 +77,7 @@ export const login = async (req, res) => {
 
         const token = jwt.sign(
             {
-            id: user._id
+                id: user._id
             },
             process.env.JWT_SECRET,
             {
@@ -109,7 +111,7 @@ export const getMe = async (req, res) => {
 
         const token = jwt.sign(
             {
-            id: user._id
+                id: user._id
             },
             process.env.JWT_SECRET,
             {
@@ -125,6 +127,114 @@ export const getMe = async (req, res) => {
         console.log(err)
         res.json({
             message: 'Нема доступу'
+        })
+    }
+}
+
+// EDIT USER
+export const editMe = async (req, res) => {
+    try {
+        const { name } = req.body
+        const user = await User.findById(req.userId)
+
+        if (req.files) {
+            let fileName = Date.now().toString() + req.files.image.name
+
+            // GET CURRENT FOLDER PATH (CONTROLLERS FOLDER)
+            const __dirname = dirname(fileURLToPath(import.meta.url))
+
+            // DELETING OLD IMG FROM UPLOADS
+            if (user.imgUrl) {
+                fs.unlinkSync('./uploads/avatar/' + user.imgUrl)
+            }
+
+            // CHECKING IF THERE AREN'T SUCH A DIRECTORY, THEN CREATE
+            if (!fs.existsSync('./uploads/avatar')) {
+                fs.mkdirSync('./uploads/avatar')
+            }
+
+            // MOVE IMG INTO UPLOADS AND GIVE IT NEW NAME
+            req.files.image.mv(path.join(__dirname, '..', 'uploads', 'avatar', fileName))
+
+            user.imgUrl = fileName
+        }
+
+        const token = jwt.sign(
+            {
+                id: user._id
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: '30d'
+            }
+        )
+
+        user.userName = name
+
+        user.save()
+
+        res.json({
+            user,
+            token
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: 'Не вдалось оновити інформацію'
+        })
+    }
+}
+
+// DELETE USER
+export const deleteMe = async (req, res) => {
+    try {
+        const { name } = req.body
+        const user = await User.findById(req.userId)
+
+        if (req.files) {
+            let fileName = Date.now().toString() + req.files.image.name
+
+            // GET CURRENT FOLDER PATH (CONTROLLERS FOLDER)
+            const __dirname = dirname(fileURLToPath(import.meta.url))
+
+            // DELETING OLD IMG FROM UPLOADS
+            if (user.imgUrl) {
+                fs.unlinkSync('./uploads/avatar/' + user.imgUrl)
+            }
+
+            // CHECKING IF THERE AREN'T SUCH A DIRECTORY, THEN CREATE
+            if (!fs.existsSync('./uploads/avatar')) {
+                fs.mkdirSync('./uploads/avatar')
+            }
+
+            // MOVE IMG INTO UPLOADS AND GIVE IT NEW NAME
+            req.files.image.mv(path.join(__dirname, '..', 'uploads', 'avatar', fileName))
+
+            user.imgUrl = fileName
+        }
+
+        const token = jwt.sign(
+            {
+                id: user._id
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: '30d'
+            }
+        )
+
+        user.userName = name
+
+        user.save()
+
+        res.json({
+            user,
+            token
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: 'Не вдалось оновити інформацію'
         })
     }
 }

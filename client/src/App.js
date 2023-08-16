@@ -9,6 +9,8 @@ import { AddPostPage } from './pages/AddPostPage.jsx'
 import { RegisterPage } from './pages/RegisterPage.jsx'
 import { LoginPage } from './pages/LoginPage.jsx'
 import { EditPostPage } from './pages/EditPostPage.jsx'
+import { MyAccount } from './pages/MyAccount.jsx'
+
 
 // LIBRIARIES
 import { Routes, Route } from 'react-router-dom'
@@ -18,14 +20,13 @@ import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
 import { getMe } from './redux/fetures/auth/authSlice.js'
 
-
 function App() {
   const dispatch = useDispatch()
 
   useEffect(() => {
     dispatch(getMe())
   }, [dispatch])
-  
+
   return (
     <Layout>
       <Routes>
@@ -36,6 +37,7 @@ function App() {
         <Route path='new' element={<AddPostPage />} />
         <Route path='register' element={<RegisterPage />} />
         <Route path='login' element={<LoginPage />} />
+        <Route path='me/:id' element={<MyAccount />} />
       </Routes>
 
       <ToastContainer position='bottom-right' />

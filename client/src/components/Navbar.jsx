@@ -6,6 +6,7 @@ import { toast } from 'react-toastify'
 
 export const Navbar = () => {
     const isAuth = useSelector(checkIsAuth)
+    const id = useSelector(state => state.auth?.user?._id)
     const dispatch = useDispatch()
 
 
@@ -58,6 +59,17 @@ export const Navbar = () => {
                             }
                         >
                             Create post
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink
+                            to={`/me/${id}`}
+                            className='text-xs text-gray-400 hover:text-white'
+                            style={({ isActive }) =>
+                                isActive ? activeStyles : undefined
+                            }
+                        >
+                            My account
                         </NavLink>
                     </li>
                 </ul>)
