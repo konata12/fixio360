@@ -13,7 +13,7 @@ const UserSchema = new mongoose.Schema(
         },
         imgUrl: {
             type: String,
-            default: ''
+            default: 'default.jpg'
         },
         posts: [{
             type:mongoose.Schema.Types.ObjectId,

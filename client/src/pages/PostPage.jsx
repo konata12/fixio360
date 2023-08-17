@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { AiFillEye, AiOutlineMessage, AiTwotoneEdit, AiFillDelete } from 'react-icons/ai'
 import Moment from 'react-moment'
 import Axios from '../utils/axios.js'
+import { toast } from 'react-toastify'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { createComment, getAllComments } from '../redux/fetures/comment/commentSlice'
@@ -20,11 +21,11 @@ export const PostPage = () => {
     const fetchPost = useCallback(async () => {
         try {
             const { data } = await Axios.get(`/posts/${params.id}`)
-        setPost(data)
+            setPost(data)
         } catch (err) {
             console.log(err)
         }
-        
+
     }, [params.id])
 
     const fetchComments = useCallback(async () => {
@@ -36,7 +37,8 @@ export const PostPage = () => {
     }, [dispatch, params.id])
 
     const deletePost = async () => {
-        await Axios.delete(`/posts/${params.id}`)
+        const { data } = await Axios.delete(`/posts/${params.id}`)
+        if (data.message) toast(data.message)
         navigate('/')
     }
 
@@ -45,6 +47,7 @@ export const PostPage = () => {
             comment,
             postId: params.id
         }))
+        setComment('')
     }
 
     useEffect(() => {
@@ -115,7 +118,7 @@ export const PostPage = () => {
                                     <AiFillEye /> <span>{post?.views}</span>
                                 </button>
                                 <button className='flex items-center justify-center gap-2 text-xs text-white opacity-50'>
-                                    <AiOutlineMessage /> <span>{post?.comments?.lenght || 0}</span>
+                                    <AiOutlineMessage /> <span>{comments?.length || 0}</span>
                                 </button>
                             </div>
 

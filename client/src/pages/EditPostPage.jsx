@@ -1,18 +1,21 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { editPost } from '../redux/fetures/post/postSlice'
 import Axios from '../utils/axios.js'
+import { toast } from 'react-toastify'
 
 export const EditPostPage = () => {
     const [title, setTitle] = useState('')
     const [text, setText] = useState('')
     const [newImage, setNewImage] = useState('')
     const [oldImage, setOldImage] = useState('')
+
+    const { status } = useSelector(state => state.post)
+    console.log(status)
     const params = useParams()
     const id = params.id
 
-    // const { status } = useSelector(state => state.auth)
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -31,6 +34,7 @@ export const EditPostPage = () => {
             params.append('image', newImage)
 
             dispatch(editPost({ params, id }))
+            if (status) toast(status)
             navigate('/')
         } catch (err) {
             console.log(err)

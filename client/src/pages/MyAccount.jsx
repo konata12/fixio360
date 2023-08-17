@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
-import { AiFillEye, AiOutlineMessage, AiTwotoneEdit, AiFillDelete } from 'react-icons/ai'
+import React, {  useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { AiTwotoneEdit, AiFillDelete } from 'react-icons/ai'
 import Axios from '../utils/axios.js'
 import { useDispatch, useSelector } from 'react-redux'
-import { editMe, getMe } from '../redux/fetures/auth/authSlice.js'
+import { editMe, logout } from '../redux/fetures/auth/authSlice.js'
 
 
 
@@ -12,9 +12,11 @@ export function MyAccount() {
     const [name, setName] = useState('')
     const [oldAvatar, setOldAvatar] = useState('')
     const [newAvatar, setNewAvatar] = useState('')
-    const user = useSelector(state => state.auth?.user)
-    console.log(user)
+
+    
     const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const user = useSelector(state => state.auth?.user)
 
     const changeEditMode = () => {
         setEdit(!edit)
@@ -29,7 +31,10 @@ export function MyAccount() {
         changeEditMode()
     }
 
-    const daleteHandler = () => {
+    const daleteHandler = async () => {
+        await Axios.delete('/auth/me')
+        dispatch(logout())
+        navigate('/')
         console.log('delete')
     }
 

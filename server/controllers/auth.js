@@ -1,4 +1,6 @@
 import User from '../models/User.js'
+import Post from "../models/Post.js";
+import Comment from "../models/Comment.js";
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import path, { dirname } from 'path';
@@ -188,48 +190,30 @@ export const editMe = async (req, res) => {
 // DELETE USER
 export const deleteMe = async (req, res) => {
     try {
-        const { name } = req.body
         const user = await User.findById(req.userId)
+        const posts = await Post.find({ _id: { $in: user.posts } })
+        const comments = await Comment.find({ author: { $in: user._id } })
 
-        if (req.files) {
-            let fileName = Date.now().toString() + req.files.image.name
-
-            // GET CURRENT FOLDER PATH (CONTROLLERS FOLDER)
-            const __dirname = dirname(fileURLToPath(import.meta.url))
-
-            // DELETING OLD IMG FROM UPLOADS
-            if (user.imgUrl) {
-                fs.unlinkSync('./uploads/avatar/' + user.imgUrl)
-            }
-
-            // CHECKING IF THERE AREN'T SUCH A DIRECTORY, THEN CREATE
-            if (!fs.existsSync('./uploads/avatar')) {
-                fs.mkdirSync('./uploads/avatar')
-            }
-
-            // MOVE IMG INTO UPLOADS AND GIVE IT NEW NAME
-            req.files.image.mv(path.join(__dirname, '..', 'uploads', 'avatar', fileName))
-
-            user.imgUrl = fileName
+        if (user.imgUrl) {
+            fs.unlink(`./uploads/post/${user.imgUrl}`, () => {
+                console.log('user img was deleted')
+            })
         }
 
-        const token = jwt.sign(
-            {
-                id: user._id
-            },
-            process.env.JWT_SECRET,
-            {
-                expiresIn: '30d'
+        posts.forEach(post => {
+            if (post.imgUrl) {
+                fs.unlink(`./uploads/post/${post.imgUrl}`, () => {
+                    console.log('posts img was deleted')
+                })
             }
-        )
+        })
 
-        user.userName = name
-
-        user.save()
+        await Comment.deleteMany({ author: { $in: user._id } })
+        await Post.deleteMany({ _id: { $in: user.posts } })
+        await User.findByIdAndDelete(user._id)
 
         res.json({
-            user,
-            token
+            message: 'User was deleted'
         })
     } catch (err) {
         console.log(err)

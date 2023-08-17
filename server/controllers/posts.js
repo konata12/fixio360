@@ -37,7 +37,8 @@ export const createPost = async (req, res) => {
             })
 
             return res.json({
-                newPostWithImage
+                newPostWithImage,
+                message: 'Створений пост з картинкою'
             })
         }
 
@@ -55,7 +56,10 @@ export const createPost = async (req, res) => {
             $push: { posts: newPostWithoutImage }
         })
 
-        res.json(newPostWithoutImage)
+        res.json({
+            newPostWithoutImage,
+            message: 'Створений пост з без картинки'
+        })
 
     } catch (err) {
         res.json({
@@ -69,6 +73,15 @@ export const getAll = async (req, res) => {
     try {
         const posts = await Post.find().sort('-createdAt')
         const popularPosts = await Post.find().limit(5).sort('-views')
+        const users = await User.find()
+
+        // const response = users.map(user => {
+            
+        //     return {
+        //         avatarUrl: user.imgUrl,
+        //         posts:
+        //     }
+        // })
 
         if (!posts) {
             return res.json({
@@ -140,7 +153,10 @@ export const updatePost = async (req, res) => {
 
         await post.save()
 
-        res.json(post)
+        res.json({
+            post,
+            message: 'Пост було оновлено'
+        })
     } catch (err) {
         res.json({
             message: 'Щось пішло не так при оновлені поста'

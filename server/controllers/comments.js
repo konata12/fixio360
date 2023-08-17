@@ -5,26 +5,20 @@ import Comment from "../models/Comment.js";
 // CREATE COMMENT
 export const createComment = async (req, res) => {
     try {
-        console.log(req.userId)
+        const user = await User.findById(req.userId)
         const { comment, postId } = req.body
 
-        console.log(postId)
-
-        console.log(1)
         const newComment = await Comment({
             comment: comment,
             author: req.userId,
+            imgUrl: user.imgUrl,
         })
-        console.log(2)
 
         await Post.findByIdAndUpdate(postId, {
             $push: { comments: newComment }
         })
-        console.log(3)
-        console.log(newComment)
 
         await newComment.save()
-        console.log(4)
 
         res.json(newComment)
     } catch (err) {

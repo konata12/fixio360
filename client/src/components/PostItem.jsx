@@ -1,10 +1,13 @@
 import React from 'react'
 import { AiFillEye, AiOutlineMessage } from 'react-icons/ai'
 import Moment from 'react-moment'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 export const PostItem = ({ post }) => {
-    if (!post) {
+    const fetching = useSelector(state => state.post?.loading)
+
+    if (fetching) {
         return (
             <div className="text-xl text-center text-white py-10">
                 Loading...
@@ -18,8 +21,8 @@ export const PostItem = ({ post }) => {
                 <div className={
                     post.imgUrl ? 'flex rounded-sm h-80' : 'flex rounded-sm'
                 }>
-                    {post.imgUrl && (
-                        <img src={`http://localhost:3002/post/${post.imgUrl}`} alt="img" className='object-cover w-full' />
+                    {post?.imgUrl && (
+                        <img src={`http://localhost:3002/post/${post?.imgUrl}`} alt="img" className='object-cover w-full' />
                     )}
                 </div>
                 <div className='flex justify-between items-center pt-2'>
@@ -44,7 +47,7 @@ export const PostItem = ({ post }) => {
                         <AiFillEye /> <span>{post.views}</span>
                     </button>
                     <button className='flex items-center justify-center gap-2 text-xs text-white opacity-50'>
-                        <AiOutlineMessage /> <span>{post.comments?.lenght || 0}</span>
+                        <AiOutlineMessage /> <span>{post.comments?.length || 0}</span>
                     </button>
                 </div>
             </div>

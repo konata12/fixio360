@@ -6,6 +6,10 @@ const CommentSchems = new mongoose.Schema(
             type: String,
             required: true,
         },
+        imgUrl: {
+            type: String,
+            default: ''
+        },
         author: {
             type: mongoose.Schema.Types.ObjectId,
             res: 'User'
