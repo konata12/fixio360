@@ -7,17 +7,16 @@ import { getAllPosts } from '../redux/fetures/post/postSlice'
 export const MainPage = () => {
     const [currentPage, setCurrentPage] = useState(1)
     const dispatch = useDispatch()
-    const { posts, popularPosts } = useSelector(state => state.post)
+    const { posts, popularPosts, postsNum } = useSelector(state => state.post)
     const fetching = useSelector(state => state.post?.loading)
 
-    const pagesNum = Math.ceil(posts?.length / 10)
-    console.log(pagesNum)
+    const pagesNum = Math.ceil(postsNum / 10)
 
     useEffect(() => {
         dispatch(getAllPosts())
     }, [dispatch])
 
-    if (!posts.length) {
+    if (!postsNum) {
         return (
             <div className="text-xl text-center text-white py-10">
                 There are no posts
@@ -38,9 +37,12 @@ export const MainPage = () => {
             <div className="flex justify-between gap-8">
                 <div className="flex flex-col gap-10 basis-4/5">
                     {
-                        posts?.map((post, i) => (
-                            <PostItem key={i} post={post} />
-                        ))
+                        posts?.map((userPosts, i) => {
+                            return userPosts.posts?.map(post => {
+                                i++
+                                return <PostItem key={i} post={post} avatar={userPosts.avatarUrl} />
+                            })
+                        })
                     }
 
                     <div className='flex w-full justify-center text-white'>
@@ -48,7 +50,11 @@ export const MainPage = () => {
                             {'<'}
                         </button>
                         {
-                            
+                            // if (currentPage < 4) {
+                            //     for (let i = currentPage; i < pagesNum && i < (currentPage + 5); i++) {
+                                    
+                            //     }
+                            // }
                         }
                         <button className='text-3xl'>
                             {'>'}

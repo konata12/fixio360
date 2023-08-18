@@ -4,7 +4,7 @@ import Moment from 'react-moment'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-export const PostItem = ({ post }) => {
+export const PostItem = ({ post, avatar }) => {
     const fetching = useSelector(state => state.post?.loading)
 
     if (fetching) {
@@ -33,6 +33,14 @@ export const PostItem = ({ post }) => {
                         <Moment date={post.createdAt} format='D MMM YYYY' />
                     </div>
                 </div>
+
+                {avatar && (<div className='rounded-full w-16 h-16 overflow-hidden'>
+                    <img
+                        src={`http://localhost:3002/avatar/${avatar}`}
+                        alt="img"
+                        className='w-full' />
+                </div>
+                )}
 
                 <div className="text-white text-xl">
                     {post.title}

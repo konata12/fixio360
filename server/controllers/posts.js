@@ -71,17 +71,7 @@ export const createPost = async (req, res) => {
 // GET ALL POSTS
 export const getAll = async (req, res) => {
     try {
-        const posts = await Post.find().sort('-createdAt')
-        const popularPosts = await Post.find().limit(5).sort('-views')
-        const users = await User.find()
-
-        // const response = users.map(user => {
-            
-        //     return {
-        //         avatarUrl: user.imgUrl,
-        //         posts:
-        //     }
-        // })
+        const posts = await Post.find().sort('-createdAt').skip(40).limit(10)
 
         if (!posts) {
             return res.json({
@@ -89,9 +79,48 @@ export const getAll = async (req, res) => {
             })
         }
 
+        let postsAuthors = await Post.aggregate([
+            {
+                $sort: { createdAt: -1 }
+            },
+            {
+                $skip: 40
+            },
+            {
+                $limit: 10
+            },
+            {
+                $group: {
+                    _id: { author: "$author" }
+                }
+            }
+        ])
+        postsAuthors = postsAuthors.map(author => {
+            return author._id.author
+        })
+        const users = await User.find({ _id: { $in: postsAuthors } })
+
+        const responsePosts = users.map(user => {
+            let userPosts = posts.map(post => {
+                if (user._id.toString() === post.author.toString()) {
+                    return post
+                }
+            }).filter(post => post)
+
+            return {
+                avatarUrl: user.imgUrl,
+                posts: userPosts
+            }
+        })
+
+        const popularPosts = await Post.find().sort('-views').limit(5)
+        const postsNum = await Post.estimatedDocumentCount()
+        console.log(posts)
+
         res.json({
-            posts,
-            popularPosts
+            responsePosts,
+            popularPosts,
+            postsNum
         })
     } catch (err) {
         res.json({

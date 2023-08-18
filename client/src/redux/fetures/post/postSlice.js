@@ -4,6 +4,7 @@ import Axios from "../../../utils/axios.js";
 const initialState = {
     posts: [],
     popularPosts: [],
+    postsNum: 0,
     loading: false,
     status: null,
 }
@@ -91,7 +92,8 @@ export const postSlice = createSlice({
         },
         [getAllPosts.fulfilled]: (state, action) => {
             state.loading = false
-            state.posts = action.payload.posts
+            state.posts = action.payload.responsePosts
+            state.postsNum = action.payload.postsNum
             state.popularPosts = action.payload.popularPosts
         },
         [getAllPosts.rejected]: (state, action) => {

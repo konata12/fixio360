@@ -119,7 +119,7 @@ export function MyAccount() {
                 ) : (
                     <div className='flex flex-col basis-1/5'>
                         {user?.imgUrl && <img
-                            className=' rounded-full'
+                            className='rounded-full'
                             src={`http://localhost:3002/avatar/${user?.imgUrl}`}
                             alt="img"
                         />}
