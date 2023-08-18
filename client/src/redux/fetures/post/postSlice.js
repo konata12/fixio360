@@ -29,10 +29,17 @@ export const editPost = createAsyncThunk('post/editPost', async ({ params, id })
     }
 })
 
-export const getAllPosts = createAsyncThunk('post/getAllPosts', async () => {
+export const getAllPosts = createAsyncThunk('post/getAllPosts', async (params) => {
     try {
-        const { data } = await Axios.get('/posts')
-        return data
+        let dataRes = []
+        if (params) {
+            const { data } = await Axios.get(`/posts/?page=${params}`)
+            dataRes = data
+        } else {
+            const { data } = await Axios.get(`/posts/`)
+            dataRes = data
+        }
+        return dataRes
     } catch (err) {
         console.log(err)
     }

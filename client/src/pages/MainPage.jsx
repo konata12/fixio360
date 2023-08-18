@@ -3,18 +3,21 @@ import { PostItem } from '../components/PostItem'
 import PopularPosts from '../components/PopularPosts'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllPosts } from '../redux/fetures/post/postSlice'
+import { useLocation } from 'react-router-dom'
 
 export const MainPage = () => {
     const [currentPage, setCurrentPage] = useState(1)
     const dispatch = useDispatch()
+    const location = useLocation()
+    const queryPage = new URLSearchParams(location.search).get('page')
     const { posts, popularPosts, postsNum } = useSelector(state => state.post)
     const fetching = useSelector(state => state.post?.loading)
 
     const pagesNum = Math.ceil(postsNum / 10)
 
     useEffect(() => {
-        dispatch(getAllPosts())
-    }, [dispatch])
+        dispatch(getAllPosts(queryPage))
+    }, [dispatch, queryPage])
 
     if (!postsNum) {
         return (
@@ -45,17 +48,25 @@ export const MainPage = () => {
                         })
                     }
 
-                    <div className='flex w-full justify-center text-white'>
+                    <div className='flex w-full justify-center text-white gap-4'>
                         <button className='text-3xl'>
                             {'<'}
                         </button>
+                        <button className='text-3xl'>
+                            {1}
+                        </button>
+
                         {
                             // if (currentPage < 4) {
                             //     for (let i = currentPage; i < pagesNum && i < (currentPage + 5); i++) {
-                                    
+
                             //     }
                             // }
                         }
+
+                        <button className='text-3xl'>
+                            {pagesNum}
+                        </button>
                         <button className='text-3xl'>
                             {'>'}
                         </button>
