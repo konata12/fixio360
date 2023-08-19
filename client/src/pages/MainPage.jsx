@@ -1,23 +1,84 @@
 import React, { useEffect, useState } from 'react'
 import { PostItem } from '../components/PostItem'
+import { PageBtn } from '../components/pagination/PageBtn'
 import PopularPosts from '../components/PopularPosts'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllPosts } from '../redux/fetures/post/postSlice'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 export const MainPage = () => {
-    const [currentPage, setCurrentPage] = useState(1)
-    const dispatch = useDispatch()
     const location = useLocation()
-    const queryPage = new URLSearchParams(location.search).get('page')
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    const [currentPage, setCurrentPage] = useState(new URLSearchParams(location.search).get('page'))
     const { posts, popularPosts, postsNum } = useSelector(state => state.post)
     const fetching = useSelector(state => state.post?.loading)
-
     const pagesNum = Math.ceil(postsNum / 10)
 
+
+    const prevPage = (pageNum) => {
+        if (typeof pageNum !== 'number') return
+
+        if (!(pageNum === null || pageNum === 1)) {
+            if (pageNum) {
+                navigate(`/?page=${pageNum - 1}`)
+                setCurrentPage(pageNum - 1)
+            }
+        }
+    }
+
+    const nextPage = (pageNum) => {
+        if (typeof pageNum === 'number') {
+            if (+pageNum < pagesNum) {
+                navigate(`/?page=${pageNum + 1}`)
+                setCurrentPage(pageNum + 1)
+            }
+            console.log(1)
+        } else if (pageNum === null) {
+            if (+pageNum < pagesNum) {
+                navigate(`/?page=${pageNum + 1}`)
+                setCurrentPage(pageNum + 1)
+            }
+            console.log(2)
+        }
+    }
+
+    const renderPagination = () => {
+        if (currentPage === null) setCurrentPage(1)
+
+        if (currentPage < 4) {
+            const buttons = []
+            for (let i = currentPage + 1; i < pagesNum && i < (currentPage + 5); i++) {
+                console.log(i)
+                buttons.push(<PageBtn key={+i} page={i} />)
+            }
+
+            return <div className='flex gap-4 items-end'>
+                {buttons}
+                <span className='inline-block text-3xl'>
+                    ...
+                </span>
+            </div>
+        } else if (currentPage > pagesNum - 4) {
+            const buttons = []
+            for (let i = pagesNum - 4; i < pagesNum && i > (pagesNum - 5); i++) {
+                console.log(i)
+                buttons.push(<PageBtn key={+i} page={i} />)
+            }
+
+            return <div className='flex gap-4 items-end'>
+                <span className='inline-block text-3xl'>
+                    ...
+                </span>
+                {buttons}
+            </div>
+        }
+    }
+
     useEffect(() => {
-        dispatch(getAllPosts(queryPage))
-    }, [dispatch, queryPage])
+        dispatch(getAllPosts(currentPage))
+    }, [dispatch, currentPage])
 
     if (!postsNum) {
         return (
@@ -49,7 +110,10 @@ export const MainPage = () => {
                     }
 
                     <div className='flex w-full justify-center text-white gap-4'>
-                        <button className='text-3xl'>
+                        <button
+                            className='text-3xl'
+                            onClick={() => prevPage(currentPage)}
+                        >
                             {'<'}
                         </button>
                         <button className='text-3xl'>
@@ -57,17 +121,16 @@ export const MainPage = () => {
                         </button>
 
                         {
-                            // if (currentPage < 4) {
-                            //     for (let i = currentPage; i < pagesNum && i < (currentPage + 5); i++) {
-
-                            //     }
-                            // }
+                            renderPagination()
                         }
 
                         <button className='text-3xl'>
                             {pagesNum}
                         </button>
-                        <button className='text-3xl'>
+                        <button
+                            className='text-3xl'
+                            onClick={() => nextPage(currentPage)}
+                        >
                             {'>'}
                         </button>
                     </div>

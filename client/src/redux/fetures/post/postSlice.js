@@ -5,6 +5,7 @@ const initialState = {
     posts: [],
     popularPosts: [],
     postsNum: 0,
+    page: 1,
     loading: false,
     status: null,
 }
@@ -99,9 +100,9 @@ export const postSlice = createSlice({
         },
         [getAllPosts.fulfilled]: (state, action) => {
             state.loading = false
-            state.posts = action.payload.responsePosts
-            state.postsNum = action.payload.postsNum
-            state.popularPosts = action.payload.popularPosts
+            state.posts = action.payload?.responsePosts
+            state.postsNum = action.payload?.postsNum
+            state.popularPosts = action.payload?.popularPosts
         },
         [getAllPosts.rejected]: (state, action) => {
             state.loading = false

@@ -71,8 +71,15 @@ export const createPost = async (req, res) => {
 // GET ALL POSTS
 export const getAll = async (req, res) => {
     try {
+        const postsNum = await Post.estimatedDocumentCount()
+        const lastPage = Math.ceil(postsNum / 10)
+        console.log(req.query.page)
+        if (req.query.page < 1 || req.query.page > lastPage) {
+            return res.json({})
+        }
+
         const page = req.query.page ? req.query.page : 1
-        const skip = page >= 1 ? ((page - 1) * 10) : 0
+        const skip = page > 1 ? ((page - 1) * 10) : 0
         const posts = await Post.find().sort('-createdAt').skip(skip).limit(10)
 
         if (!posts) {
@@ -116,7 +123,6 @@ export const getAll = async (req, res) => {
         })
 
         const popularPosts = await Post.find().sort('-views').limit(5)
-        const postsNum = await Post.estimatedDocumentCount()
 
         res.json({
             responsePosts,
