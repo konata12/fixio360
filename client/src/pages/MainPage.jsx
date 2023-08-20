@@ -11,46 +11,53 @@ export const MainPage = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    const [currentPage, setCurrentPage] = useState(new URLSearchParams(location.search).get('page'))
+    // RETURNS: NULL, NaN, NUMBER
+    const [currentPage, setCurrentPage] = useState(
+        (new URLSearchParams(location.search).get('page')) === null ?
+            null :
+            +(new URLSearchParams(location.search).get('page'))
+    )
     const { posts, popularPosts, postsNum } = useSelector(state => state.post)
     const fetching = useSelector(state => state.post?.loading)
     const pagesNum = Math.ceil(postsNum / 10)
-
+    console.log(posts)
 
     const prevPage = (pageNum) => {
-        if (typeof pageNum !== 'number') return
+        if (Number.isNaN(pageNum)) return
+        if (pageNum === null) pageNum = 1
 
-        if (!(pageNum === null || pageNum === 1)) {
-            if (pageNum) {
-                navigate(`/?page=${pageNum - 1}`)
-                setCurrentPage(pageNum - 1)
-            }
+        if (pageNum > 1) {
+            navigate(`/?page=${pageNum - 1}`)
+            setCurrentPage(pageNum - 1)
         }
     }
 
     const nextPage = (pageNum) => {
-        if (typeof pageNum === 'number') {
-            if (+pageNum < pagesNum) {
-                navigate(`/?page=${pageNum + 1}`)
-                setCurrentPage(pageNum + 1)
-            }
-            console.log(1)
-        } else if (pageNum === null) {
-            if (+pageNum < pagesNum) {
-                navigate(`/?page=${pageNum + 1}`)
-                setCurrentPage(pageNum + 1)
-            }
-            console.log(2)
+        if (Number.isNaN(pageNum)) return
+        if (pageNum === null) pageNum = 1
+
+        if (pageNum < pagesNum) {
+            navigate(`/?page=${pageNum + 1}`)
+            setCurrentPage(pageNum + 1)
         }
     }
 
-    const renderPagination = () => {
-        if (currentPage === null) setCurrentPage(1)
+    const firstPage = (pageNum) => {
+        navigate(`/?page=1`)
+        setCurrentPage(1)
+    }
 
-        if (currentPage < 4) {
+    const renderPagination = (pageNum) => {
+        if (Number.isNaN(pageNum)) return (
+            <div className="text-xl text-center text-white py-10">
+                There are no posts
+            </div>
+        )
+        if (pageNum === null) pageNum = 1
+
+        if (pageNum < 4) {
             const buttons = []
-            for (let i = currentPage + 1; i < pagesNum && i < (currentPage + 5); i++) {
-                console.log(i)
+            for (let i = pageNum + 1; i < pagesNum && i < (pageNum + 5); i++) {
                 buttons.push(<PageBtn key={+i} page={i} />)
             }
 
@@ -60,10 +67,9 @@ export const MainPage = () => {
                     ...
                 </span>
             </div>
-        } else if (currentPage > pagesNum - 4) {
+        } else if (pageNum > pagesNum - 4) {
             const buttons = []
             for (let i = pagesNum - 4; i < pagesNum && i > (pagesNum - 5); i++) {
-                console.log(i)
                 buttons.push(<PageBtn key={+i} page={i} />)
             }
 
@@ -72,26 +78,41 @@ export const MainPage = () => {
                     ...
                 </span>
                 {buttons}
+            </div>
+        } else if (pageNum >= 4 || pageNum <= pagesNum - 4) {
+            const buttons = []
+            for (let i = pageNum - 2; i < pageNum + 3; i++) {
+                buttons.push(<PageBtn key={+i} page={i} />)
+            }
+
+            return <div className='flex gap-4 items-end'>
+                <span className='inline-block text-3xl'>
+                    ...
+                </span>
+                {buttons}
+                <span className='inline-block text-3xl'>
+                    ...
+                </span>
             </div>
         }
     }
 
     useEffect(() => {
-        dispatch(getAllPosts(currentPage))
-    }, [dispatch, currentPage])
-
-    if (!postsNum) {
-        return (
-            <div className="text-xl text-center text-white py-10">
-                There are no posts
-            </div>
-        )
-    }
+        dispatch(getAllPosts({ currentPage, pagesNum }))
+    }, [dispatch, currentPage, pagesNum])
 
     if (fetching) {
         return (
             <div className="text-xl text-center text-white py-10">
                 Loading...
+            </div>
+        )
+    }
+
+    if (!postsNum) {
+        return (
+            <div className="text-xl text-center text-white py-10">
+                There are no posts
             </div>
         )
     }
@@ -116,12 +137,15 @@ export const MainPage = () => {
                         >
                             {'<'}
                         </button>
-                        <button className='text-3xl'>
+                        <button
+                            className='text-3xl'
+                            onClick={firstPage}
+                        >
                             {1}
                         </button>
 
                         {
-                            renderPagination()
+                            renderPagination(currentPage)
                         }
 
                         <button className='text-3xl'>

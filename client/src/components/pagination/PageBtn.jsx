@@ -7,6 +7,7 @@ export function PageBtn({ page }) {
     const clickHandler = () => {
         navigate(`/?page=${page}`)
     }
+    
     return (
         <button
             className='flex justify-center items-center text-white text-3xl'

@@ -2,10 +2,13 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import Axios from "../../../utils/axios.js";
 
 const initialState = {
+    // POSTS
     posts: [],
     popularPosts: [],
+    // PAGINATION
     postsNum: 0,
     page: 1,
+    // STATUS
     loading: false,
     status: null,
 }
@@ -30,16 +33,23 @@ export const editPost = createAsyncThunk('post/editPost', async ({ params, id })
     }
 })
 
-export const getAllPosts = createAsyncThunk('post/getAllPosts', async (params) => {
+export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ currentPage, pagesNum }) => {
     try {
         let dataRes = []
-        if (params) {
-            const { data } = await Axios.get(`/posts/?page=${params}`)
+        // console.log(currentPage)
+        // console.log(Number.isNaN(currentPage))
+        if (Number.isNaN(currentPage)) return
+        if (currentPage < 1 || currentPage > pagesNum) return 
+        // console.log('message')
+
+        if (currentPage) {
+            const { data } = await Axios.get(`/posts/?page=${currentPage}`)
             dataRes = data
         } else {
             const { data } = await Axios.get(`/posts/`)
             dataRes = data
         }
+        console.log('request made')
         return dataRes
     } catch (err) {
         console.log(err)
@@ -68,8 +78,8 @@ export const postSlice = createSlice({
         [createPost.fulfilled]: (state, action) => {
             state.loading = false
             action.payload.newPostWithImage ?
-            state.posts.push(action.payload.newPostWithImage) :
-            state.posts.push(action.payload.newPostWithoutImage)
+                state.posts.push(action.payload.newPostWithImage) :
+                state.posts.push(action.payload.newPostWithoutImage)
             state.status = action.payload.message
         },
         [createPost.rejected]: (state, action) => {
