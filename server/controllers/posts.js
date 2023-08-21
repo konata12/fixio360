@@ -71,8 +71,8 @@ export const createPost = async (req, res) => {
 // GET ALL POSTS
 export const getAll = async (req, res) => {
     try {
-        console.log(req.query.page)
-        const page = req.query.page ? req.query.page : 1
+        console.log(+req.query.page)
+        const page = +req.query.page ? +req.query.page : 1
         const skip = page > 1 ? ((page - 1) * 10) : 0
         const posts = await Post.find().sort('-createdAt').skip(skip).limit(10)
 
@@ -87,7 +87,7 @@ export const getAll = async (req, res) => {
                 $sort: { createdAt: -1 }
             },
             {
-                $skip: 40
+                $skip: skip
             },
             {
                 $limit: 10
@@ -98,6 +98,7 @@ export const getAll = async (req, res) => {
                 }
             }
         ])
+
         postsAuthors = postsAuthors.map(author => {
             return author._id.author
         })

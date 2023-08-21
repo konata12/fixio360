@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { useDispatch, useSelector } from 'react-redux'
 import Axios from "../../../utils/axios.js";
 
 const initialState = {
@@ -33,23 +34,18 @@ export const editPost = createAsyncThunk('post/editPost', async ({ params, id })
     }
 })
 
-export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ currentPage, pagesNum }) => {
+export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ page, pagesNum }) => {
     try {
         let dataRes = []
-        // console.log(currentPage)
-        // console.log(Number.isNaN(currentPage))
-        if (Number.isNaN(currentPage)) return
-        if (currentPage < 1 || currentPage > pagesNum) return 
-        // console.log('message')
 
-        if (currentPage) {
-            const { data } = await Axios.get(`/posts/?page=${currentPage}`)
+        if (page) {
+            const { data } = await Axios.get(`/posts/?page=${page}`)
             dataRes = data
         } else {
             const { data } = await Axios.get(`/posts/`)
             dataRes = data
         }
-        console.log('request made')
+
         return dataRes
     } catch (err) {
         console.log(err)
@@ -68,7 +64,12 @@ export const getMyPosts = createAsyncThunk('post/getMyPosts', async () => {
 export const postSlice = createSlice({
     name: 'post',
     initialState,
-    reducers: {},
+    reducers: {
+        setPage: (state, action) => {
+            state.page = action.payload
+            console.log(state.page)
+        }
+    },
     extraReducers: {
         // CREATE POST
         [createPost.pending]: (state, action) => {
@@ -119,5 +120,7 @@ export const postSlice = createSlice({
         },
     }
 })
+
+export const { setPage } = postSlice.actions
 
 export default postSlice.reducer
