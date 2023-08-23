@@ -44,11 +44,8 @@ export const MainPage = () => {
                     ) : (
                         <div className="flex flex-col gap-10 basis-4/5">
                             {
-                                posts?.map((userPosts, i) => {
-                                    return userPosts.posts?.map(post => {
-                                        i++
-                                        return <PostItem key={i} post={post} avatar={userPosts.avatarUrl} />
-                                    })
+                                posts?.map((userPost, i) => {
+                                    return <PostItem key={i} post={userPost.post} avatar={userPost.avatarUrl} />
                                 })
                             }
 

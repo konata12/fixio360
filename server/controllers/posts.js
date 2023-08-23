@@ -104,19 +104,20 @@ export const getAll = async (req, res) => {
         })
         const users = await User.find({ _id: { $in: postsAuthors } })
 
-        const responsePosts = users.map(user => {
-            let userPosts = posts.map(post => {
+        const responsePosts = posts.map(post => {
+            const userUrl = users.map(user => {
                 if (user?._id.toString() === post?.author.toString()) {
-                    return post
+                    return user.imgUrl
                 }
-            }).filter(post => post)
+            }).filter(user => user)
+            console.log(userUrl)
 
             return {
-                avatarUrl: user.imgUrl,
-                posts: userPosts
+                avatarUrl: userUrl[0],
+                post: post
             }
         })
-        
+
         if (Number.isNaN(page) || (page < 1)) responsePosts.splice(0, responsePosts.length)
         const popularPosts = await Post.find().sort('-views').limit(5)
         const postsNum = await Post.estimatedDocumentCount()
