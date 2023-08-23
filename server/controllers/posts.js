@@ -71,8 +71,8 @@ export const createPost = async (req, res) => {
 // GET ALL POSTS
 export const getAll = async (req, res) => {
     try {
-        console.log(+req.query.page)
-        const page = +req.query.page ? +req.query.page : 1
+        const page = req.query.page === undefined ?
+            1 : +req.query.page
         const skip = page > 1 ? ((page - 1) * 10) : 0
         const posts = await Post.find().sort('-createdAt').skip(skip).limit(10)
 
@@ -100,13 +100,13 @@ export const getAll = async (req, res) => {
         ])
 
         postsAuthors = postsAuthors.map(author => {
-            return author._id.author
+            return author?._id.author
         })
         const users = await User.find({ _id: { $in: postsAuthors } })
 
         const responsePosts = users.map(user => {
             let userPosts = posts.map(post => {
-                if (user._id.toString() === post.author.toString()) {
+                if (user?._id.toString() === post?.author.toString()) {
                     return post
                 }
             }).filter(post => post)
@@ -116,7 +116,8 @@ export const getAll = async (req, res) => {
                 posts: userPosts
             }
         })
-
+        
+        if (Number.isNaN(page) || (page < 1)) responsePosts.splice(0, responsePosts.length)
         const popularPosts = await Post.find().sort('-views').limit(5)
         const postsNum = await Post.estimatedDocumentCount()
 

@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { useDispatch, useSelector } from 'react-redux'
 import Axios from "../../../utils/axios.js";
 
 const initialState = {
@@ -8,7 +7,7 @@ const initialState = {
     popularPosts: [],
     // PAGINATION
     postsNum: 0,
-    page: 1,
+    page: null,
     // STATUS
     loading: false,
     status: null,
@@ -34,9 +33,10 @@ export const editPost = createAsyncThunk('post/editPost', async ({ params, id })
     }
 })
 
-export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ page, pagesNum }) => {
+export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ currentPage }) => {
     try {
         let dataRes = []
+        const page = currentPage
 
         if (page) {
             const { data } = await Axios.get(`/posts/?page=${page}`)
@@ -45,6 +45,7 @@ export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ page, p
             const { data } = await Axios.get(`/posts/`)
             dataRes = data
         }
+        console.log(dataRes)
 
         return dataRes
     } catch (err) {
