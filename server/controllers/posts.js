@@ -73,54 +73,49 @@ export const getAll = async (req, res) => {
     try {
         const page = req.query.page === undefined ?
             1 : +req.query.page
-        const skip = page > 1 ? ((page - 1) * 10) : 0
-        const posts = await Post.find().sort('-createdAt').skip(skip).limit(10)
 
-        if (!posts) {
-            return res.json({
-                message: 'There are no posts'
-            })
-        }
-
-        let postsAuthors = await Post.aggregate([
-            {
-                $sort: { createdAt: -1 }
-            },
-            {
-                $skip: skip
-            },
-            {
-                $limit: 10
-            },
-            {
-                $group: {
-                    _id: { author: "$author" }
-                }
-            }
-        ])
-
-        postsAuthors = postsAuthors.map(author => {
-            return author?._id.author
-        })
-        const users = await User.find({ _id: { $in: postsAuthors } })
-
-        const responsePosts = posts.map(post => {
-            const userUrl = users.map(user => {
-                if (user?._id.toString() === post?.author.toString()) {
-                    return user.imgUrl
-                }
-            }).filter(user => user)
-            console.log(userUrl)
-
-            return {
-                avatarUrl: userUrl[0],
-                post: post
-            }
-        })
-
-        if (Number.isNaN(page) || (page < 1)) responsePosts.splice(0, responsePosts.length)
+        let responsePosts = []
         const popularPosts = await Post.find().sort('-views').limit(5)
         const postsNum = await Post.estimatedDocumentCount()
+
+        if (page >= 1 && page <= postsNum) {
+            const skip = page > 1 ? ((page - 1) * 10) : 0
+            const posts = await Post.find().sort('-createdAt').skip(skip).limit(10)
+
+            if (!posts.length) {
+                return res.json({
+                    message: 'There are no posts'
+                })
+            }
+
+            let postsAuthors = await Post.aggregate().sort('-createdAt')
+                .skip(skip)
+                .limit(10)
+                .group({
+                    _id: { author: "$author" }
+                }).then((res) => {
+                    return res.map(author => {
+                        return author._id.author
+                    })
+                }).catch((err) => {
+                    console.log(err)
+                })
+
+            const users = await User.find({ _id: { $in: postsAuthors } })
+
+            responsePosts = posts.map(post => {
+                const userUrl = users.map(user => {
+                    if (user?._id.toString() === post?.author.toString()) {
+                        return user.imgUrl
+                    }
+                }).filter(user => user)
+
+                return {
+                    avatarUrl: userUrl[0],
+                    post: post
+                }
+            })
+        }
 
         res.json({
             responsePosts,

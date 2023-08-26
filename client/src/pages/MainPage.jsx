@@ -38,7 +38,7 @@ export const MainPage = () => {
             <div className="flex justify-between gap-8">
                 {
                     (!posts?.length) ? (
-                        <div className="text-xl text-center text-white py-10">
+                        <div className="flex justify-center items-center basis-4/5 text-xl text-center text-white">
                             There are no posts
                         </div>
                     ) : (

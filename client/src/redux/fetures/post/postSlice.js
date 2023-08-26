@@ -36,10 +36,9 @@ export const editPost = createAsyncThunk('post/editPost', async ({ params, id })
 export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ currentPage }) => {
     try {
         let dataRes = []
-        const page = currentPage
 
-        if (page) {
-            const { data } = await Axios.get(`/posts/?page=${page}`)
+        if (currentPage) {
+            const { data } = await Axios.get(`/posts/?page=${currentPage}`)
             dataRes = data
         } else {
             const { data } = await Axios.get(`/posts/`)
