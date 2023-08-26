@@ -5,13 +5,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getAllPosts } from '../redux/fetures/post/postSlice'
 import { useLocation } from 'react-router-dom'
 import Pagination from '../components/pagination/Pagination'
+import { PaginationFilter } from '../components/pagination/PaginationFilter'
 
 export const MainPage = () => {
     const location = useLocation()
     const dispatch = useDispatch()
 
     const { posts, popularPosts, page, postsNum, loading } = useSelector(state => state.post)
-    const pagesNum = Math.ceil(postsNum / 10)
 
     console.log(page)
 
@@ -43,13 +43,15 @@ export const MainPage = () => {
                         </div>
                     ) : (
                         <div className="flex flex-col gap-10 basis-4/5">
+                            <PaginationFilter />
+
                             {
                                 posts?.map((userPost, i) => {
                                     return <PostItem key={i} post={userPost.post} avatar={userPost.avatarUrl} />
                                 })
                             }
 
-                            <Pagination page={currentPage} pagesNum={pagesNum} loading={loading} posts={posts} />
+                            <Pagination page={currentPage} postsNum={postsNum} loading={loading} posts={posts} />
                         </div>
                     )
                 }

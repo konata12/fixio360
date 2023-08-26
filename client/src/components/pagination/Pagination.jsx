@@ -4,20 +4,16 @@ import { useDispatch } from 'react-redux'
 import { PageBtn } from './PageBtn'
 import { setPage } from '../../redux/fetures/post/postSlice'
 
-export default function Pagination({ page, pagesNum, loading, posts }) {
+export default function Pagination({ page, postsNum, loading, posts }) {
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
-    console.log(page)
-
-    const isNull = page === null
-    page = +page
-
-    console.log(page)
+    const pagesNum = Math.ceil(postsNum / 10)
+    page = page === null ? null : +page
 
     const nextPage = (pageNum) => {
         if (Number.isNaN(pageNum)) return
-        if (isNull) pageNum++
+        if (!page) pageNum++
         if (pageNum >= pagesNum || pageNum < 1) return
 
         pageNum++
@@ -92,7 +88,7 @@ export default function Pagination({ page, pagesNum, loading, posts }) {
 
     // IF LOADING OR THERE AREN'T POSTS THEN DON'T RENDER
     if (
-        !isNull &&
+        page &&
         (loading ||
             !posts.length ||
             (page > pagesNum || page < 1))

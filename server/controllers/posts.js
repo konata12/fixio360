@@ -71,8 +71,13 @@ export const createPost = async (req, res) => {
 // GET ALL POSTS
 export const getAll = async (req, res) => {
     try {
+        console.log(req.query.filter)
+        const filter = req.query.filter === undefined ?
+            'date' : req.query.page
         const page = req.query.page === undefined ?
             1 : +req.query.page
+
+        console.log(filter)
 
         let responsePosts = []
         const popularPosts = await Post.find().sort('-views').limit(5)
