@@ -1,29 +1,29 @@
 import React, { useEffect } from 'react'
-import { PostItem } from '../components/PostItem'
 import PopularPosts from '../components/PopularPosts'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllPosts } from '../redux/fetures/post/postSlice'
 import { useLocation } from 'react-router-dom'
-import Pagination from '../components/pagination/Pagination'
-import { PaginationFilter } from '../components/pagination/PaginationFilter'
+import { Pagination } from '../components/pagination/Pagination'
 
 export const MainPage = () => {
     const location = useLocation()
     const dispatch = useDispatch()
 
-    const { posts, popularPosts, page, postsNum, loading } = useSelector(state => state.post)
-
-    console.log(page)
+    const { posts, popularPosts, page, loading } = useSelector(state => state.post)
 
     const currentPage = (new URLSearchParams(location.search).get('page')) === page ?
         page :
         (new URLSearchParams(location.search).get('page'))
 
-    console.log(currentPage)
+    const filter = (new URLSearchParams(location.search).get('filter')) === null ?
+        '' :
+        (new URLSearchParams(location.search).get('filter'))
+
+    console.log(filter)
 
     useEffect(() => {
-        dispatch(getAllPosts({ currentPage }))
-    }, [dispatch, currentPage])
+        dispatch(getAllPosts({ currentPage, filter }))
+    }, [dispatch, currentPage, filter])
 
     if (loading) {
         return (
@@ -42,17 +42,7 @@ export const MainPage = () => {
                             There are no posts
                         </div>
                     ) : (
-                        <div className="flex flex-col gap-10 basis-4/5">
-                            <PaginationFilter />
-
-                            {
-                                posts?.map((userPost, i) => {
-                                    return <PostItem key={i} post={userPost.post} avatar={userPost.avatarUrl} />
-                                })
-                            }
-
-                            <Pagination page={currentPage} postsNum={postsNum} loading={loading} posts={posts} />
-                        </div>
+                        <Pagination page={currentPage} filter={filter} posts={posts} />
                     )
                 }
                 <div className="basis-1/5">

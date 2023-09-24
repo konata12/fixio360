@@ -1,131 +1,24 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { PageBtn } from './PageBtn'
-import { setPage } from '../../redux/fetures/post/postSlice'
+import { PostItem } from '../PostItem'
+import { PaginationFilter } from './PaginationFilter'
+import { PaginationBottom } from './PaginationBottom'
 
-export default function Pagination({ page, postsNum, loading, posts }) {
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
+import { useSelector } from 'react-redux'
 
-    const pagesNum = Math.ceil(postsNum / 10)
-    page = page === null ? null : +page
-
-    const nextPage = (pageNum) => {
-        if (Number.isNaN(pageNum)) return
-        if (!page) pageNum++
-        if (pageNum >= pagesNum || pageNum < 1) return
-
-        pageNum++
-
-        navigate(`/?page=${pageNum}`)
-        dispatch(setPage(pageNum))
-    }
-
-    const prevPage = (pageNum) => {
-        if (Number.isNaN(pageNum)) return
-        if (pageNum <= 1 || pageNum > pagesNum) return
-
-        pageNum--
-
-        navigate(`/?page=${pageNum}`)
-        dispatch(setPage(pageNum))
-    }
-
-    const firstPage = () => {
-        navigate(`/?page=${1}`)
-        dispatch(setPage(1))
-    }
-
-    const lastPage = () => {
-        navigate(`/?page=${pagesNum}`)
-        dispatch(setPage(pagesNum))
-    }
-
-    const renderPagination = (pageNum) => {
-        if (pageNum < 4) {
-            const buttons = []
-            for (let i = 2; i < pagesNum && i < 6; i++) {
-                buttons.push(<PageBtn key={+i} page={i} />)
-            }
-
-            return <div className='flex gap-4 items-end'>
-                {buttons}
-                <span className='inline-block text-3xl'>
-                    ...
-                </span>
-            </div>
-        } else if (pageNum > pagesNum - 3) {
-            const buttons = []
-            for (let i = pagesNum - 4; i < pagesNum && i > (pagesNum - 5); i++) {
-                buttons.push(<PageBtn key={+i} page={i} />)
-            }
-
-            return <div className='flex gap-4 items-end'>
-                <span className='inline-block text-3xl'>
-                    ...
-                </span>
-                {buttons}
-            </div>
-        } else if (pageNum >= 4 || pageNum <= pagesNum - 4) {
-            const buttons = []
-            for (let i = pageNum - 2; i < pageNum + 3; i++) {
-                buttons.push(<PageBtn key={+i} page={i} />)
-            }
-
-            return <div className='flex gap-4 items-end'>
-                <span className='inline-block text-3xl'>
-                    ...
-                </span>
-                {buttons}
-                <span className='inline-block text-3xl'>
-                    ...
-                </span>
-            </div>
-        }
-
-    }
-
-    // IF LOADING OR THERE AREN'T POSTS THEN DON'T RENDER
-    if (
-        page &&
-        (loading ||
-            !posts.length ||
-            (page > pagesNum || page < 1))
-    ) return
+export function Pagination({ page, posts, filter }) {
+    const { postsNum, loading } = useSelector(state => state.post)
 
     return (
-        <div className='flex w-full justify-center text-white gap-4'>
-            {console.log(33333)}
-            <button
-                className='text-3xl'
-                onClick={() => prevPage(page)}
-            >
-                {'<'}
-            </button>
-            <button
-                className='text-3xl'
-                onClick={firstPage}
-            >
-                {1}
-            </button>
+        <div className="flex flex-col gap-10 basis-4/5">
+            <PaginationFilter page={page} />
 
             {
-                renderPagination(page)
+                posts?.map((userPost, i) => {
+                    return <PostItem key={i} post={userPost.post} avatar={userPost.avatarUrl} />
+                })
             }
 
-            <button
-                className='text-3xl'
-                onClick={() => lastPage(pagesNum)}
-            >
-                {pagesNum}
-            </button>
-            <button
-                className='text-3xl'
-                onClick={() => nextPage(page)}
-            >
-                {'>'}
-            </button>
+            <PaginationBottom page={page} postsNum={postsNum} loading={loading} posts={posts} filter={filter} />
         </div>
     )
 }

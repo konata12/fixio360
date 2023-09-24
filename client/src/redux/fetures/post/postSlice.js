@@ -8,6 +8,8 @@ const initialState = {
     // PAGINATION
     postsNum: 0,
     page: null,
+    filter: 'byDate',
+    filterType: 'decreasing',
     // STATUS
     loading: false,
     status: null,
@@ -33,15 +35,17 @@ export const editPost = createAsyncThunk('post/editPost', async ({ params, id })
     }
 })
 
-export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ currentPage }) => {
+export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ currentPage, filter }) => {
     try {
         let dataRes = []
+        filter = filter ? '&filter=' + filter :
+            ''
 
         if (currentPage) {
-            const { data } = await Axios.get(`/posts/?page=${currentPage}`)
+            const { data } = await Axios.get(`/posts/?page=${currentPage}${filter}`)
             dataRes = data
         } else {
-            const { data } = await Axios.get(`/posts/`)
+            const { data } = await Axios.get(`/posts/${filter}`)
             dataRes = data
         }
         console.log(dataRes)

@@ -72,20 +72,38 @@ export const createPost = async (req, res) => {
 export const getAll = async (req, res) => {
     try {
         console.log(req.query.filter)
-        const filter = req.query.filter === undefined ?
-            'date' : req.query.page
+        let filter = req.query.filter === undefined ?
+            '-createdAt' : req.query.filter
+        console.log(filter)
         const page = req.query.page === undefined ?
             1 : +req.query.page
-
-        console.log(filter)
 
         let responsePosts = []
         const popularPosts = await Post.find().sort('-views').limit(5)
         const postsNum = await Post.estimatedDocumentCount()
 
         if (page >= 1 && page <= postsNum) {
+            // filter
+            switch (filter) {
+                case '-createdAt':
+                case '-author':
+                case '-views':
+                case '+createdAt':
+                case '+author':
+                case '+views':
+                    // filter = filter
+                    break;
+
+                default:
+                    res.json({
+                        message: 'There are no such a filter'
+                    })
+                    break;
+            }
+
+            // get posts
             const skip = page > 1 ? ((page - 1) * 10) : 0
-            const posts = await Post.find().sort('-createdAt').skip(skip).limit(10)
+            const posts = await Post.find().sort(`${filter}`).skip(skip).limit(10)
 
             if (!posts.length) {
                 return res.json({
@@ -93,7 +111,7 @@ export const getAll = async (req, res) => {
                 })
             }
 
-            let postsAuthors = await Post.aggregate().sort('-createdAt')
+            let postsAuthors = await Post.aggregate().sort(`${filter}`)
                 .skip(skip)
                 .limit(10)
                 .group({
