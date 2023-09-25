@@ -2,11 +2,11 @@ import React from 'react'
 
 export function PaginationFilter({ page }) {
     const selectFilter = () => {
-            
+        
     }
 
     const selectFilterType = () => {
-            
+
     }
     return (
         <div>

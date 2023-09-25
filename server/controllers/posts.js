@@ -72,11 +72,15 @@ export const createPost = async (req, res) => {
 export const getAll = async (req, res) => {
     try {
         console.log(req.query.filter)
-        let filter = req.query.filter === undefined ?
+        const filter = req.query.filter === undefined ?
             '-createdAt' : req.query.filter
         console.log(filter)
+
+        console.log(req.query.page)
         const page = req.query.page === undefined ?
             1 : +req.query.page
+        console.log(req.query.page)
+
 
         let responsePosts = []
         const popularPosts = await Post.find().sort('-views').limit(5)
@@ -92,10 +96,11 @@ export const getAll = async (req, res) => {
                 case '+author':
                 case '+views':
                     // filter = filter
+                    console.log(1)
                     break;
 
                 default:
-                    res.json({
+                    return res.json({
                         message: 'There are no such a filter'
                     })
                     break;
