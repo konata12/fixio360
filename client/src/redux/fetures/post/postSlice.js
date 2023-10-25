@@ -42,8 +42,11 @@ export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ current
         filter = filter[0] ? filter.replace(/\+/g, '%2B') : filter
         filter = filter ? '&filter=' + filter :
             ''
+        
+        console.log(currentPage)
+        console.log(currentPage && currentPage !== 'null')
 
-        if (currentPage) {
+        if (currentPage && currentPage !== 'null') {
             const { data } = await Axios.get(`/posts/?page=${currentPage}${filter}`)
             dataRes = data
         } else {
@@ -76,16 +79,11 @@ export const postSlice = createSlice({
             console.log(state.page)
         },
         setFilter: (state, action) => {
-            console.log(state.filter)
             state.filter = action.payload.replace(/(-|\+)(?=[a-zA-Z])/g, '')
-            console.log(state.filter)
         },
         setFilterType: (state, action) => {
-            console.log(state.filter)
             state.filterType = action.payload.replace(/-|\+/g, action.payload)
             state.filter = state.filter.replace(/-|\+/g, action.payload)
-            console.log(state.filter)
-            console.log(state.filterType)
         },
     },
     extraReducers: {

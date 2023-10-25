@@ -7,7 +7,6 @@ export function PaginationFilter({ page }) {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { filter, filterType } = useSelector(state => state.post)
-    console.log(filter)
 
     const filterOptions = [
         { value: 'createdAt', label: 'date' },
@@ -20,31 +19,22 @@ export function PaginationFilter({ page }) {
         { value: '-', label: 'descending' },
     ]
 
+    console.log(filter)
+    
     const selectedFilter = (filter) => {
-        // let filtered = filterOptions.map((option, i) => {
-        //     if (option.value === filter) return i
-        // })
-        // filtered = filtered.map(val => {
-        //     if(val !== undefined) return val
-        // })
-        // return filtered
-        return filterOptions.find((option, i) => {
-            if (option.value === filter) return i
-        })
+        return filterOptions.indexOf(option => option.value === filter)
     }
 
     console.log(selectedFilter(filter))
 
     const selectFilter = (filter) => {
-        console.log(filter)
-        console.log(filterType)
+        page = page === null ? 1 : page
         navigate(`/?page=${page}&filter=${filterType}${filter}`)
         dispatch(setFilter(filter))
     }
 
     const selectFilterType = (filterType) => {
-        console.log(filter)
-        console.log(filterType)
+        page = page === null ? 1 : page
         navigate(`/?page=${page}&filter=${filterType}${filter}`)
         dispatch(setFilterType(filterType))
     }
@@ -66,16 +56,6 @@ export function PaginationFilter({ page }) {
                 name='filterType'
                 onChange={(e) => selectFilterType(e.value)}
             />
-            {/* <select name="filter" id="" onChange={(e) => selectFilter(e.target.value)}>
-                <option value="createdAt" key="1">date</option>
-                <option defaultValue value="views" key="2">views</option>
-                <option value="author" key="3">author</option>
-            </select>
-
-            <select name="filterType" id="" onChange={(e) => selectFilterType(e.target.value)}>
-                <option value="+" key="1">increasing</option>
-                <option value="-" key="2">descending</option>
-            </select> */}
         </div>
     )
 }
