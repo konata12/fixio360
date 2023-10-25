@@ -19,7 +19,7 @@ export const MainPage = () => {
         '' :
         (new URLSearchParams(location.search).get('filter'))
 
-    console.log(filter)
+    // console.log(filter)
 
     useEffect(() => {
         dispatch(getAllPosts({ currentPage, filter }))
