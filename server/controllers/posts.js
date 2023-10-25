@@ -76,11 +76,8 @@ export const getAll = async (req, res) => {
             '-createdAt' : req.query.filter
         console.log(filter)
 
-        console.log(req.query.page)
         const page = req.query.page === undefined ?
             1 : +req.query.page
-        console.log(req.query.page)
-
 
         let responsePosts = []
         const popularPosts = await Post.find().sort('-views').limit(5)

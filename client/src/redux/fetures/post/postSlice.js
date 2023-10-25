@@ -8,8 +8,8 @@ const initialState = {
     // PAGINATION
     postsNum: 0,
     page: null,
-    filter: 'byDate',
-    filterType: 'decreasing',
+    filter: 'createdAt',
+    filterType: '-',
     // STATUS
     loading: false,
     status: null,
@@ -38,6 +38,8 @@ export const editPost = createAsyncThunk('post/editPost', async ({ params, id })
 export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ currentPage, filter }) => {
     try {
         let dataRes = []
+        
+        filter = filter[0] ? filter.replace(/\+/g, '%2B') : filter
         filter = filter ? '&filter=' + filter :
             ''
 
@@ -72,7 +74,19 @@ export const postSlice = createSlice({
         setPage: (state, action) => {
             state.page = action.payload
             console.log(state.page)
-        }
+        },
+        setFilter: (state, action) => {
+            console.log(state.filter)
+            state.filter = action.payload.replace(/(-|\+)(?=[a-zA-Z])/g, '')
+            console.log(state.filter)
+        },
+        setFilterType: (state, action) => {
+            console.log(state.filter)
+            state.filterType = action.payload.replace(/-|\+/g, action.payload)
+            state.filter = state.filter.replace(/-|\+/g, action.payload)
+            console.log(state.filter)
+            console.log(state.filterType)
+        },
     },
     extraReducers: {
         // CREATE POST
@@ -126,5 +140,7 @@ export const postSlice = createSlice({
 })
 
 export const { setPage } = postSlice.actions
+export const { setFilter } = postSlice.actions
+export const { setFilterType } = postSlice.actions
 
 export default postSlice.reducer
