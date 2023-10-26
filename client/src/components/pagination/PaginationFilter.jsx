@@ -21,11 +21,14 @@ export function PaginationFilter({ page }) {
 
     console.log(filter)
     
-    const selectedFilter = (filter) => {
-        return filterOptions.indexOf(option => option.value === filter)
+    const selectedFilter = (filter, arr) => {
+        const filtered = arr.map(option => {
+            return option.value
+        })
+        return filtered.indexOf(filter)
     }
 
-    console.log(selectedFilter(filter))
+    console.log(selectedFilter(filter, filterOptions))
 
     const selectFilter = (filter) => {
         page = page === null ? 1 : page
@@ -42,7 +45,7 @@ export function PaginationFilter({ page }) {
     return (
         <div>
             <Select
-                defaultValue={filterOptions[0]}
+                defaultValue={filterOptions[selectedFilter(filter, filterOptions)]}
                 isSearchable={true}
                 options={filterOptions}
                 name='filter'
@@ -50,7 +53,7 @@ export function PaginationFilter({ page }) {
             />
 
             <Select
-                defaultValue={filterTypeOptions[0]}
+                defaultValue={filterTypeOptions[selectedFilter(filterType, filterTypeOptions)]}
                 isSearchable={true}
                 options={filterTypeOptions}
                 name='filterType'

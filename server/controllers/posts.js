@@ -71,7 +71,6 @@ export const createPost = async (req, res) => {
 // GET ALL POSTS
 export const getAll = async (req, res) => {
     try {
-        console.log(req.query.filter)
         const filter = req.query.filter === undefined ?
             '-createdAt' : req.query.filter
         console.log(filter)

@@ -38,13 +38,10 @@ export const editPost = createAsyncThunk('post/editPost', async ({ params, id })
 export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ currentPage, filter }) => {
     try {
         let dataRes = []
-        
+
         filter = filter[0] ? filter.replace(/\+/g, '%2B') : filter
         filter = filter ? '&filter=' + filter :
             ''
-        
-        console.log(currentPage)
-        console.log(currentPage && currentPage !== 'null')
 
         if (currentPage && currentPage !== 'null') {
             const { data } = await Axios.get(`/posts/?page=${currentPage}${filter}`)
