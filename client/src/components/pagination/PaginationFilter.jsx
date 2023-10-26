@@ -19,14 +19,46 @@ export function PaginationFilter({ page }) {
         { value: '-', label: 'descending' },
     ]
 
+    const selectStyles = {
+        control: () => ({
+            display: 'flex',
+            padding: '7px',
+            borderRadius: '5px',
+            border: '1px solid #aaa',
+            background: '#4b5563',
+            color: '#fff',
+            transition: 'all 0.3s ease-out',
+
+            ":hover": {
+                background: '#1f2937'
+            }
+        }),
+        menu: () => ({
+            width: '100%',
+            background: '#4b5563',
+            borderRadius: '5px',
+            border: '1px solid #aaa',
+            color: '#fff',
+            overflow: 'hidden',
+            position: 'absolute'
+        }),
+        option: () => ({
+            background: 'rgb(75 85 99 / var(1))',
+            padding: '7px 0',
+            transition: 'all 0.3s ease-out',
+
+            ":hover": {
+                background: '#1f2937'
+            }
+        }),
+    }
+
     const selectedFilter = (filter, arr) => {
         const filtered = arr.map(option => {
             return option.value
         })
         return filtered.indexOf(filter)
     }
-
-    console.log(selectedFilter(filter, filterOptions))
 
     const selectFilter = (filter) => {
         page = page === null ? 1 : page
@@ -44,34 +76,22 @@ export function PaginationFilter({ page }) {
         <div className="flex text-l text-center">
             <Select
                 defaultValue={filterOptions[selectedFilter(filter, filterOptions)]}
-                isSearchable={true}
+                isSearchable={false}
                 options={filterOptions}
                 name='filter'
                 onChange={(e) => selectFilter(e.value)}
-                // unstyled
-                className={{
-                    input: () => 'bg-pink-400',
-                    // menu: () => 'bg-gray-600',
-                    // option: () => 'bg-gray-600 py-4',
-                }}
+                unstyled
+                styles={selectStyles}
             />
 
             <Select
                 defaultValue={filterTypeOptions[selectedFilter(filterType, filterTypeOptions)]}
-                isSearchable={true}
+                isSearchable={false}
                 options={filterTypeOptions}
                 name='filterType'
                 onChange={(e) => selectFilterType(e.value)}
-                styles={{
-                    option: () => ({
-                        background: 'rgb(75 85 99 / var(1))',
-                        padding: '5px 0'
-                    }),
-                    menu: () => ({
-                        background: '#4b5563',
-                        borderRadius: '5px'
-                    })
-                }}
+                unstyled
+                styles={selectStyles}
             />
         </div>
     )
