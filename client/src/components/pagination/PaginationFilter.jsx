@@ -9,9 +9,9 @@ export function PaginationFilter({ page }) {
     const { filter, filterType } = useSelector(state => state.post)
 
     const filterOptions = [
-        { value: 'createdAt', label: 'date' },
-        { value: 'views', label: 'views' },
-        { value: 'author', label: 'author' },
+        { value: 'createdAt', label: 'by date' },
+        { value: 'views', label: 'by views' },
+        { value: 'author', label: 'by author' },
     ]
 
     const filterTypeOptions = [
@@ -19,8 +19,6 @@ export function PaginationFilter({ page }) {
         { value: '-', label: 'descending' },
     ]
 
-    console.log(filter)
-    
     const selectedFilter = (filter, arr) => {
         const filtered = arr.map(option => {
             return option.value
@@ -43,13 +41,19 @@ export function PaginationFilter({ page }) {
     }
 
     return (
-        <div>
+        <div className="flex text-l text-center">
             <Select
                 defaultValue={filterOptions[selectedFilter(filter, filterOptions)]}
                 isSearchable={true}
                 options={filterOptions}
                 name='filter'
                 onChange={(e) => selectFilter(e.value)}
+                // unstyled
+                className={{
+                    input: () => 'bg-pink-400',
+                    // menu: () => 'bg-gray-600',
+                    // option: () => 'bg-gray-600 py-4',
+                }}
             />
 
             <Select
@@ -58,6 +62,16 @@ export function PaginationFilter({ page }) {
                 options={filterTypeOptions}
                 name='filterType'
                 onChange={(e) => selectFilterType(e.value)}
+                styles={{
+                    option: () => ({
+                        background: 'rgb(75 85 99 / var(1))',
+                        padding: '5px 0'
+                    }),
+                    menu: () => ({
+                        background: '#4b5563',
+                        borderRadius: '5px'
+                    })
+                }}
             />
         </div>
     )
