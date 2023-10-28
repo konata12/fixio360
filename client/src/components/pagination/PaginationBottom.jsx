@@ -35,12 +35,10 @@ export function PaginationBottom({ page, postsNum, loading, posts, filter }) {
     }
 
     const firstPage = () => {
-        navigate(`/?page=${1}${filter}`)
         dispatch(setPage(1))
     }
 
     const lastPage = () => {
-        navigate(`/?page=${pagesNum}${filter}`)
         dispatch(setPage(pagesNum))
     }
 
@@ -105,23 +103,19 @@ export function PaginationBottom({ page, postsNum, loading, posts, filter }) {
             >
                 {'<'}
             </button>
-            <button
-                className='text-3xl'
-                onClick={firstPage}
-            >
-                {1}
-            </button>
-
+            <PageBtn
+                page={1}
+                filter={filter}
+                // onClick={firstPage}
+            />
             {
                 renderPagination(page)
             }
-
-            <button
-                className='text-3xl'
-                onClick={() => lastPage(pagesNum)}
-            >
-                {pagesNum}
-            </button>
+            <PageBtn
+                page={pagesNum}
+                filter={filter}
+                // onClick={() => lastPage(pagesNum)}
+            />
             <button
                 className='text-3xl'
                 onClick={() => nextPage(page)}
