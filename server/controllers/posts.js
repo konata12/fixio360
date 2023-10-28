@@ -73,7 +73,6 @@ export const getAll = async (req, res) => {
     try {
         const filter = req.query.filter === undefined ?
             '-createdAt' : req.query.filter
-        console.log(filter)
 
         const page = req.query.page === undefined ?
             1 : +req.query.page
@@ -91,8 +90,6 @@ export const getAll = async (req, res) => {
                 case '+createdAt':
                 case '+author':
                 case '+views':
-                    // filter = filter
-                    console.log(1)
                     break;
 
                 default:
@@ -101,11 +98,18 @@ export const getAll = async (req, res) => {
                     })
                     break;
             }
+            const anus = filter.slice(1)
+            const sort = {}
+            sort[anus] = filter[0] === '+' ? 1 : -1
+
+            console.log(page)
+            console.log(sort)
 
             // get posts
             const skip = page > 1 ? ((page - 1) * 10) : 0
-            const posts = await Post.find().sort(`${filter}`).skip(skip).limit(10)
+            const posts = await Post.find().sort(sort).skip(skip).limit(10)
 
+            // check if there are posts
             if (!posts.length) {
                 return res.json({
                     message: 'There are no posts'
@@ -139,6 +143,20 @@ export const getAll = async (req, res) => {
                     post: post
                 }
             })
+
+            // responsePosts.sort((a, b) => {
+            //     const param = filter.slice(1)
+            //     const postA = a.post[param]
+            //     const postB = b.post[param]
+            //     console.log(param)
+            //     console.log(postA)
+            //     console.log(postB)
+
+            //     if(postA > postB) return -1
+            //     if(postA == postB) return 0
+            //     if(postA < postB) return 1
+
+            // })
         }
 
         res.json({

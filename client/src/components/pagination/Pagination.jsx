@@ -7,10 +7,11 @@ import { useSelector } from 'react-redux'
 
 export function Pagination({ page, posts, filter }) {
     const { postsNum, loading } = useSelector(state => state.post)
+    console.log(filter)
 
     return (
         <div className="flex flex-col gap-10 basis-4/5">
-            <PaginationFilter page={page} />
+            <PaginationFilter page={page} filter={filter} />
 
             {
                 posts?.map((userPost, i) => {

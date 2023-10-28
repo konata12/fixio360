@@ -1,11 +1,12 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
-export function PageBtn({ page }) {
+export function PageBtn({ page, filter }) {
     const navigate = useNavigate()
+    filter = filter.replace(/[+]/, '%2B')
 
     const clickHandler = () => {
-        navigate(`/?page=${page}`)
+        navigate(`/?page=${page}${filter}`)
     }
     
     return (

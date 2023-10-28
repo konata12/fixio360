@@ -43,6 +43,8 @@ export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ current
         filter = filter ? '&filter=' + filter :
             ''
 
+        console.log(filter)
+
         if (currentPage && currentPage !== 'null') {
             const { data } = await Axios.get(`/posts/?page=${currentPage}${filter}`)
             dataRes = data

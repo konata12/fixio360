@@ -10,7 +10,8 @@ export function PaginationBottom({ page, postsNum, loading, posts, filter }) {
 
     const pagesNum = Math.ceil(postsNum / 10)
     page = page === null ? null : +page
-    filter = '&filter=-' + filter
+    console.log(filter)
+    filter = '&filter=' + filter.replace(/[+]/, '%2B')
 
     const nextPage = (pageNum) => {
         if (Number.isNaN(pageNum)) return
@@ -19,7 +20,7 @@ export function PaginationBottom({ page, postsNum, loading, posts, filter }) {
 
         pageNum++
 
-        navigate(`/?page=${pageNum}`)
+        navigate(`/?page=${pageNum}${filter}`)
         dispatch(setPage(pageNum))
     }
 
@@ -29,17 +30,17 @@ export function PaginationBottom({ page, postsNum, loading, posts, filter }) {
 
         pageNum--
 
-        navigate(`/?page=${pageNum}`)
+        navigate(`/?page=${pageNum}${filter}`)
         dispatch(setPage(pageNum))
     }
 
     const firstPage = () => {
-        navigate(`/?page=${1}`)
+        navigate(`/?page=${1}${filter}`)
         dispatch(setPage(1))
     }
 
     const lastPage = () => {
-        navigate(`/?page=${pagesNum}`)
+        navigate(`/?page=${pagesNum}${filter}`)
         dispatch(setPage(pagesNum))
     }
 
@@ -47,7 +48,7 @@ export function PaginationBottom({ page, postsNum, loading, posts, filter }) {
         if (pageNum < 4) {
             const buttons = []
             for (let i = 2; i < pagesNum && i < 6; i++) {
-                buttons.push(<PageBtn key={+i} page={i} />)
+                buttons.push(<PageBtn key={+i} page={i} filter={filter} />)
             }
 
             return <div className='flex gap-4 items-end'>
@@ -59,7 +60,7 @@ export function PaginationBottom({ page, postsNum, loading, posts, filter }) {
         } else if (pageNum > pagesNum - 3) {
             const buttons = []
             for (let i = pagesNum - 4; i < pagesNum && i > (pagesNum - 5); i++) {
-                buttons.push(<PageBtn key={+i} page={i} />)
+                buttons.push(<PageBtn key={+i} page={i} filter={filter} />)
             }
 
             return <div className='flex gap-4 items-end'>
@@ -71,7 +72,7 @@ export function PaginationBottom({ page, postsNum, loading, posts, filter }) {
         } else if (pageNum >= 4 || pageNum <= pagesNum - 4) {
             const buttons = []
             for (let i = pageNum - 2; i < pageNum + 3; i++) {
-                buttons.push(<PageBtn key={+i} page={i} />)
+                buttons.push(<PageBtn key={+i} page={i} filter={filter} />)
             }
 
             return <div className='flex gap-4 items-end'>
