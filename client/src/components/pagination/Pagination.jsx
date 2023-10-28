@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux'
 
 export function Pagination({ page, posts, filter }) {
     const { postsNum, loading } = useSelector(state => state.post)
-    console.log(filter)
+    filter = filter === '' ? '-createdAt' : filter
 
     return (
         <div className="flex flex-col gap-10 basis-4/5">

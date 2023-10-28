@@ -7,6 +7,7 @@ export function PaginationFilter({ page, filter }) {
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
+    console.log(filter)
     const filterType = filter[0] === '+' ? '%2B' : '-'
     filter = filter.slice(1)
     console.log(filter)
