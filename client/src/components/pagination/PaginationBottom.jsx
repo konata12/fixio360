@@ -1,46 +1,13 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { ArrowBtn } from './ArrowBtn'
 import { PageBtn } from './PageBtn'
-import { setPage } from '../../redux/fetures/post/postSlice'
 
 export function PaginationBottom({ page, postsNum, loading, posts, filter }) {
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
 
     const pagesNum = Math.ceil(postsNum / 10)
     page = page === null ? null : +page
     console.log(filter)
     filter = '&filter=' + filter.replace(/[+]/, '%2B')
-
-    const nextPage = (pageNum) => {
-        if (Number.isNaN(pageNum)) return
-        if (!page) pageNum++
-        if (pageNum >= pagesNum || pageNum < 1) return
-
-        pageNum++
-
-        navigate(`/?page=${pageNum}${filter}`)
-        dispatch(setPage(pageNum))
-    }
-
-    const prevPage = (pageNum) => {
-        if (Number.isNaN(pageNum)) return
-        if (pageNum <= 1 || pageNum > pagesNum) return
-
-        pageNum--
-
-        navigate(`/?page=${pageNum}${filter}`)
-        dispatch(setPage(pageNum))
-    }
-
-    const firstPage = () => {
-        dispatch(setPage(1))
-    }
-
-    const lastPage = () => {
-        dispatch(setPage(pagesNum))
-    }
 
     const renderPagination = (pageNum) => {
         if (pageNum < 4) {
@@ -96,17 +63,16 @@ export function PaginationBottom({ page, postsNum, loading, posts, filter }) {
 
     return (
         <div className='flex w-full justify-center text-white gap-4'>
-            {console.log(33333)}
-            <button
-                className='text-3xl'
-                onClick={() => prevPage(page)}
+            <ArrowBtn
+                page={page}
+                filter={filter}
+                pagesNum={pagesNum}
             >
                 {'<'}
-            </button>
+            </ArrowBtn>
             <PageBtn
                 page={1}
                 filter={filter}
-                // onClick={firstPage}
             />
             {
                 renderPagination(page)
@@ -114,14 +80,15 @@ export function PaginationBottom({ page, postsNum, loading, posts, filter }) {
             <PageBtn
                 page={pagesNum}
                 filter={filter}
-                // onClick={() => lastPage(pagesNum)}
             />
-            <button
-                className='text-3xl'
-                onClick={() => nextPage(page)}
+            <ArrowBtn
+                page={page}
+                filter={filter}
+                pagesNum={pagesNum}
             >
                 {'>'}
-            </button>
+            </ArrowBtn>
+            {console.log(33333)}
         </div>
     )
 }
