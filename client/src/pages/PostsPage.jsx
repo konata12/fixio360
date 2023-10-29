@@ -20,7 +20,7 @@ export const PostsPage = () => {
     }, [])
 
     return (
-        <div className='w-1/2 mx-auto py-10 flex flex-col gap-10'>
+        <div className='w-2/3 mx-auto py-10 flex flex-col gap-10'>
             {myPosts?.map((post, idx) => (
                 <PostItem post={post} key={idx} />
             ))}

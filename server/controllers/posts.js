@@ -143,20 +143,6 @@ export const getAll = async (req, res) => {
                     post: post
                 }
             })
-
-            // responsePosts.sort((a, b) => {
-            //     const param = filter.slice(1)
-            //     const postA = a.post[param]
-            //     const postB = b.post[param]
-            //     console.log(param)
-            //     console.log(postA)
-            //     console.log(postB)
-
-            //     if(postA > postB) return -1
-            //     if(postA == postB) return 0
-            //     if(postA < postB) return 1
-
-            // })
         }
 
         res.json({
@@ -267,12 +253,63 @@ export const deleteMyPost = async (req, res) => {
 export const getMyPosts = async (req, res) => {
     try {
         const user = await User.findById(req.userId)
-        const userPosts = await Post.find({ _id: { $in: user.posts } })
+        // const userPosts = await Post.find({ _id: { $in: user.posts } })
 
-        res.json(userPosts)
-    } catch (err) {
+        // console.log(userPosts.length)
+
+        // res.json(userPosts)
+
+        const filter = req.query.filter === undefined ?
+            '-createdAt' : req.query.filter
+
+        const page = req.query.page === undefined ?
+            1 : +req.query.page
+
+        let responsePosts = []
+        const postsNum = await Post.countDocuments({ author: req.userId })
+        console.log(postsNum)
+
+        if (page >= 1 && page <= postsNum) {
+            // filter
+            switch (filter) {
+                case '-createdAt':
+                case '-views':
+                case '+createdAt':
+                case '+views':
+                    break;
+
+                default:
+                    return res.json({
+                        message: 'There are no such a filter'
+                    })
+                    break;
+            }
+            const anus = filter.slice(1)
+            const sort = {}
+            sort[anus] = filter[0] === '+' ? 1 : -1
+
+            console.log(page)
+            console.log(sort)
+
+            // get posts
+            const skip = page > 1 ? ((page - 1) * 10) : 0
+            responsePosts = await Post.find({ author: req.userId }).sort(sort).skip(skip).limit(10)
+
+            console.log(responsePosts)
+
+            // check if there are posts
+            if (!responsePosts.length) {
+                return res.json({
+                    message: 'There are no posts'
+                })
+            }
+        }
+
         res.json({
-            message: 'Something gone wrong'
+            responsePosts,
+            postsNum
         })
+    } catch (err) {
+        res.json(err.message)
     }
 }
