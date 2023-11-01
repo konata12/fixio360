@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import PopularPosts from '../components/PopularPosts'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllPosts } from '../redux/fetures/post/postSlice'
@@ -6,9 +6,10 @@ import { useLocation } from 'react-router-dom'
 import { Pagination } from '../components/pagination/Pagination'
 
 export const MainPage = () => {
+    const [keyword, setKeyword] = useState('')
+    const { posts, popularPosts, page, loading } = useSelector(state => state.post)
     const location = useLocation()
     const dispatch = useDispatch()
-    const { posts, popularPosts, page, loading } = useSelector(state => state.post)
 
     const currentPage = (new URLSearchParams(location.search).get('page')) === page ?
         page :

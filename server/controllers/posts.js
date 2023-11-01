@@ -80,6 +80,8 @@ export const getAll = async (req, res) => {
 
         let responsePosts = []
         const popularPosts = await Post.find().sort('-views').limit(5)
+
+        // SEARCH FOR POSTS BY KEYWORD IF THERE IS
         const postsNum = keyword.lenght ? await Post.estimatedDocumentCount() :
             await Post.countDocuments({ title: { '$regex': new RegExp(`${keyword}`) } })
 
@@ -265,7 +267,7 @@ export const getMyPosts = async (req, res) => {
 
         console.log(keyword.length, 'slovo')
 
-        // counting this author posts
+        // counting this author posts by keywords
         const postsNum = await Post.countDocuments({ author: req.userId, title: { '$regex': new RegExp(`${keyword}`) } })
         console.log(postsNum, 10)
 
