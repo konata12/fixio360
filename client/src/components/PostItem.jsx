@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 
 export const PostItem = ({ post, avatar }) => {
     const fetching = useSelector(state => state.post?.loading)
+    // console.log(post)
 
     if (fetching) {
         return (

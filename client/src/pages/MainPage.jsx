@@ -8,7 +8,6 @@ import { Pagination } from '../components/pagination/Pagination'
 export const MainPage = () => {
     const location = useLocation()
     const dispatch = useDispatch()
-
     const { posts, popularPosts, page, loading } = useSelector(state => state.post)
 
     const currentPage = (new URLSearchParams(location.search).get('page')) === page ?
@@ -40,7 +39,12 @@ export const MainPage = () => {
                             There are no posts
                         </div>
                     ) : (
-                        <Pagination page={currentPage} filter={filter} posts={posts} />
+                        <Pagination
+                            page={currentPage}
+                            filter={filter}
+                            posts={posts}
+                            path={location.pathname}
+                        />
                     )
                 }
                 <div className="basis-1/5">

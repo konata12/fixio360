@@ -60,10 +60,27 @@ export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ current
     }
 })
 
-export const getMyPosts = createAsyncThunk('post/getMyPosts', async () => {
+export const getMyPosts = createAsyncThunk('post/getMyPosts', async ({ currentPage, filter }) => {
     try {
-        const { data } = await Axios.get('/posts/user/me')
-        return data
+        let dataRes = []
+
+        filter = filter[0] ? filter.replace(/\+/g, '%2B') : filter
+        filter = filter ? '&filter=' + filter :
+            ''
+
+        console.log(currentPage)
+        console.log(filter)
+
+        if (currentPage && currentPage !== 'null') {
+            const { data } = await Axios.get(`/posts/user/me/?page=${currentPage}${filter}`)
+            dataRes = data
+        } else {
+            const { data } = await Axios.get(`/posts/user/me/${filter}`)
+            dataRes = data
+        }
+        console.log(dataRes)
+
+        return dataRes
     } catch (err) {
         console.log(err)
     }
@@ -131,6 +148,20 @@ export const postSlice = createSlice({
             state.popularPosts = action.payload?.popularPosts
         },
         [getAllPosts.rejected]: (state, action) => {
+            state.loading = false
+        },
+
+        // GET MY POSTS
+        [getMyPosts.pending]: (state) => {
+            state.loading = true
+            state.status = null
+        },
+        [getMyPosts.fulfilled]: (state, action) => {
+            state.loading = false
+            state.posts = action.payload?.responsePosts
+            state.postsNum = action.payload?.postsNum
+        },
+        [getMyPosts.rejected]: (state, action) => {
             state.loading = false
         },
     }

@@ -1,11 +1,11 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
-export function PageBtn({ page, filter }) {
+export function PageBtn({ page, filter, path }) {
     const navigate = useNavigate()
 
     const numberHandler = () => {
-        navigate(`/?page=${page}${filter}`)
+        navigate(`${path}?page=${page}${filter}`)
     }
     
     return (

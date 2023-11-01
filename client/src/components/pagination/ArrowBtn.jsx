@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { setPage } from '../../redux/fetures/post/postSlice'
 
-export function ArrowBtn({ children, page, filter, pagesNum }) {
+export function ArrowBtn({ children, page, filter, pagesNum, path }) {
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
@@ -14,7 +14,7 @@ export function ArrowBtn({ children, page, filter, pagesNum }) {
 
         pageNum++
 
-        navigate(`/?page=${pageNum}${filter}`)
+        navigate(`${path}?page=${pageNum}${filter}`)
         dispatch(setPage(pageNum))
     }
 
@@ -24,7 +24,7 @@ export function ArrowBtn({ children, page, filter, pagesNum }) {
 
         pageNum--
 
-        navigate(`/?page=${pageNum}${filter}`)
+        navigate(`${path}?page=${pageNum}${filter}`)
         dispatch(setPage(pageNum))
     }
 

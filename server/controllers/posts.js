@@ -73,13 +73,15 @@ export const getAll = async (req, res) => {
     try {
         const filter = req.query.filter === undefined ?
             '-createdAt' : req.query.filter
-
         const page = req.query.page === undefined ?
             1 : +req.query.page
+        const keyword = req.query.keyword === undefined ?
+            '' : req.query.keyword
 
         let responsePosts = []
         const popularPosts = await Post.find().sort('-views').limit(5)
-        const postsNum = await Post.estimatedDocumentCount()
+        const postsNum = keyword.lenght ? await Post.estimatedDocumentCount() :
+            await Post.countDocuments({ title: { '$regex': new RegExp(`${keyword}`) } })
 
         if (page >= 1 && page <= postsNum) {
             // filter
@@ -107,7 +109,7 @@ export const getAll = async (req, res) => {
 
             // get posts
             const skip = page > 1 ? ((page - 1) * 10) : 0
-            const posts = await Post.find().sort(sort).skip(skip).limit(10)
+            const posts = await Post.find({ title: { '$regex': new RegExp(`${keyword}`) } }).sort(sort).skip(skip).limit(10)
 
             // check if there are posts
             if (!posts.length) {
@@ -253,21 +255,21 @@ export const deleteMyPost = async (req, res) => {
 export const getMyPosts = async (req, res) => {
     try {
         const user = await User.findById(req.userId)
-        // const userPosts = await Post.find({ _id: { $in: user.posts } })
-
-        // console.log(userPosts.length)
-
-        // res.json(userPosts)
 
         const filter = req.query.filter === undefined ?
             '-createdAt' : req.query.filter
-
         const page = req.query.page === undefined ?
             1 : +req.query.page
+        const keyword = req.query.keyword === undefined ?
+            '' : req.query.keyword
+
+        console.log(keyword.length, 'slovo')
+
+        // counting this author posts
+        const postsNum = await Post.countDocuments({ author: req.userId, title: { '$regex': new RegExp(`${keyword}`) } })
+        console.log(postsNum, 10)
 
         let responsePosts = []
-        const postsNum = await Post.countDocuments({ author: req.userId })
-        console.log(postsNum)
 
         if (page >= 1 && page <= postsNum) {
             // filter
@@ -287,18 +289,27 @@ export const getMyPosts = async (req, res) => {
             const anus = filter.slice(1)
             const sort = {}
             sort[anus] = filter[0] === '+' ? 1 : -1
+            // sort.title = keyword
 
-            console.log(page)
-            console.log(sort)
+            console.log(page, 0)
+            console.log(sort, 1)
 
             // get posts
             const skip = page > 1 ? ((page - 1) * 10) : 0
-            responsePosts = await Post.find({ author: req.userId }).sort(sort).skip(skip).limit(10)
+            responsePosts = await Post.find({ author: req.userId, title: { '$regex': new RegExp(`${keyword}`) } })
+                .sort(sort)
+                .skip(skip)
+                .limit(10)
 
-            console.log(responsePosts)
+            responsePosts = {
+                avatarUrl: user.imgUrl,
+                posts: responsePosts
+            }
+
+            console.log(responsePosts.posts.length)
 
             // check if there are posts
-            if (!responsePosts.length) {
+            if (!responsePosts.posts.length) {
                 return res.json({
                     message: 'There are no posts'
                 })

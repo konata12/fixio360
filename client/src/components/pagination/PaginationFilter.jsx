@@ -3,14 +3,12 @@ import { useDispatch } from 'react-redux'
 import { setFilter, setFilterType } from '../../redux/fetures/post/postSlice'
 import Select from 'react-select'
 
-export function PaginationFilter({ page, filter }) {
+export function PaginationFilter({ page, filter, path }) {
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
-    console.log(filter)
     const filterType = filter[0] === '+' ? '%2B' : '-'
     filter = filter.slice(1)
-    console.log(filter)
 
     const filterOptions = [
         { value: 'createdAt', label: 'by date' },
@@ -66,13 +64,13 @@ export function PaginationFilter({ page, filter }) {
 
     const selectFilter = (filter) => {
         page = page === null ? 1 : page
-        navigate(`/?page=${page}&filter=${filterType}${filter}`)
+        navigate(`${path}?page=${page}&filter=${filterType}${filter}`)
         dispatch(setFilter(filter))
     }
 
     const selectFilterType = (filterType) => {
         page = page === null ? 1 : page
-        navigate(`/?page=${page}&filter=${filterType}${filter}`)
+        navigate(`${path}?page=${page}&filter=${filterType}${filter}`)
         dispatch(setFilterType(filterType))
     }
 
