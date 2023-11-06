@@ -2,15 +2,20 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setFilter, setFilterType } from '../../redux/fetures/post/postSlice'
 import Select from 'react-select'
+import { useState } from 'react'
 
 export function PaginationFilter({ page, filter, path }) {
+    const [keyWord, setKeyWord] = useState('')
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
     const filterType = filter[0] === '+' ? '%2B' : '-'
     filter = filter.slice(1)
 
-    const filterOptions = [
+    const filterOptions = path.includes('posts') ? [
+        { value: 'createdAt', label: 'by date' },
+        { value: 'views', label: 'by views' },
+    ] : [
         { value: 'createdAt', label: 'by date' },
         { value: 'views', label: 'by views' },
         { value: 'author', label: 'by author' },
@@ -64,18 +69,28 @@ export function PaginationFilter({ page, filter, path }) {
 
     const selectFilter = (filter) => {
         page = page === null ? 1 : page
-        navigate(`${path}?page=${page}&filter=${filterType}${filter}`)
+        navigate(`${path}?page=${page}
+            &filter=${filterType}${filter}`)
         dispatch(setFilter(filter))
     }
 
     const selectFilterType = (filterType) => {
         page = page === null ? 1 : page
-        navigate(`${path}?page=${page}&filter=${filterType}${filter}`)
+        navigate(`${path}?page=${page}
+            &filter=${filterType}${filter}`)
         dispatch(setFilterType(filterType))
     }
 
     return (
         <div className="flex text-l text-center">
+            <input
+                className='rounded px-2 py-2 focus: border-none'
+                type="text"
+                onChange={(e) => {
+                    setKeyWord(e.target.value)
+                }}
+                placeholder='search'
+            />
             <Select
                 defaultValue={filterOptions[selectedFilter(filter, filterOptions)]}
                 isSearchable={false}

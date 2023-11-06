@@ -38,19 +38,22 @@ export const editPost = createAsyncThunk('post/editPost', async ({ params, id })
 export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ currentPage, filter }) => {
     try {
         let dataRes = []
+        console.log(1)
 
         filter = filter[0] ? filter.replace(/\+/g, '%2B') : filter
         filter = filter ? '&filter=' + filter :
             ''
 
-        console.log(filter)
+        console.log(currentPage, filter)
 
         if (currentPage && currentPage !== 'null') {
             const { data } = await Axios.get(`/posts/?page=${currentPage}${filter}`)
             dataRes = data
+            console.log(3)
         } else {
-            const { data } = await Axios.get(`/posts/${filter}`)
+            const { data } = await Axios.get(`/posts/?${filter.slice(1)}`)
             dataRes = data
+            console.log(4)
         }
         console.log(dataRes)
 
@@ -72,10 +75,12 @@ export const getMyPosts = createAsyncThunk('post/getMyPosts', async ({ currentPa
         console.log(filter)
 
         if (currentPage && currentPage !== 'null') {
+            console.log(3)
             const { data } = await Axios.get(`/posts/user/me/?page=${currentPage}${filter}`)
             dataRes = data
         } else {
-            const { data } = await Axios.get(`/posts/user/me/${filter}`)
+            console.log(4)
+            const { data } = await Axios.get(`/posts/user/me/?${filter.slice(1)}`)
             dataRes = data
         }
         console.log(dataRes)

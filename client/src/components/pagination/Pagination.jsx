@@ -1,12 +1,40 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { PostItem } from '../PostItem'
 import { PaginationFilter } from './PaginationFilter'
 import { PaginationBottom } from './PaginationBottom'
 
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 
-export function Pagination({ page, posts, filter, path }) {
-    const { postsNum, loading } = useSelector(state => state.post)
+export function Pagination({ request }) {
+    const location = useLocation()
+    const dispatch = useDispatch()
+    const path = location.pathname
+    const { postsNum, loading, posts, page } = useSelector(state => state.post)
+
+    console.log(postsNum, loading, posts, page)
+
+    const currentPage = (new URLSearchParams(location.search).get('page')) === page ?
+        page :
+        (new URLSearchParams(location.search).get('page'))
+    let filter = (new URLSearchParams(location.search).get('filter')) === null ?
+        '' :
+        (new URLSearchParams(location.search).get('filter'))
+    const keyword = (new URLSearchParams(location.search).get('filter')) === null ?
+        '' :
+        (new URLSearchParams(location.search).get('filter'))
+
+    console.log(currentPage, filter, keyword)
+
+    useEffect(() => {
+        console.log('message')
+        import('../../redux/fetures/post/postSlice').then((res) => {
+            dispatch(res[request]({ currentPage, filter }))
+        }).catch((err) => {
+            console.log(err)
+        })
+    }, [dispatch, currentPage, filter, request])
+
     filter = filter === '' ? '-createdAt' : filter
 
     return (
