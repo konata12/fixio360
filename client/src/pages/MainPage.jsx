@@ -6,14 +6,6 @@ import { Pagination } from '../components/pagination/Pagination'
 export const MainPage = () => {
     const { loading, popularPosts } = useSelector(state => state.post)
 
-    // if (loading) {
-    //     return (
-    //         <div className="text-xl text-center text-white py-10">
-    //             Loading...
-    //         </div>
-    //     )
-    // }
-
     return (
         <div className='max-w-[900px] mx-auto py-10'>
             <div className="flex justify-between gap-8">
@@ -25,7 +17,9 @@ export const MainPage = () => {
                         POPULAR:
                     </div>
 
-                    {
+                    {loading ? <div className="w-auto text-xl text-center text-white py-10 mx-auto">
+                        Loading...
+                    </div> :
                         popularPosts?.map((post, index) => (
                             <PopularPosts key={index} post={post} />
                         ))

@@ -4,8 +4,8 @@ import { setFilter, setFilterType } from '../../redux/fetures/post/postSlice'
 import Select from 'react-select'
 import { useState } from 'react'
 
-export function PaginationFilter({ page, filter, path }) {
-    const [keyWord, setKeyWord] = useState('')
+export function PaginationFilter({ page, filter, path, keyword }) {
+    const [keyWord, setKeyWord] = useState(keyword)
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
@@ -69,16 +69,21 @@ export function PaginationFilter({ page, filter, path }) {
 
     const selectFilter = (filter) => {
         page = page === null ? 1 : page
-        navigate(`${path}?page=${page}
-            &filter=${filterType}${filter}`)
-        dispatch(setFilter(filter))
+        console.log(keyWord)
+        navigate(`${path}?page=${page}&filter=${filterType}${filter}${keyWord ? `&keyword=${keyWord}` : ''}`)
     }
 
     const selectFilterType = (filterType) => {
         page = page === null ? 1 : page
-        navigate(`${path}?page=${page}
-            &filter=${filterType}${filter}`)
-        dispatch(setFilterType(filterType))
+        navigate(`${path}?page=${page}&filter=${filterType}${filter}${keyWord ? `&keyword=${keyWord}` : ''}`)
+    }
+
+    const pushKeyWord = (e) => {
+        console.log(keyWord)
+        if (e.key === 'Enter') {
+            page = page === null ? 1 : page
+            navigate(`${path}?page=${page}&filter=${filterType}${filter}${keyWord ? `&keyword=${keyWord}` : ''}`)
+        }
     }
 
     return (
@@ -89,6 +94,7 @@ export function PaginationFilter({ page, filter, path }) {
                 onChange={(e) => {
                     setKeyWord(e.target.value)
                 }}
+                onKeyUp={(e) => {pushKeyWord(e)}}
                 placeholder='search'
             />
             <Select

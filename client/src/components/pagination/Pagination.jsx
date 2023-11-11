@@ -12,30 +12,36 @@ export function Pagination({ request }) {
     const path = location.pathname
     const { postsNum, loading, posts, page } = useSelector(state => state.post)
 
-    console.log(postsNum, loading, posts, page)
-
     const currentPage = (new URLSearchParams(location.search).get('page')) === page ?
         page :
         (new URLSearchParams(location.search).get('page'))
     let filter = (new URLSearchParams(location.search).get('filter')) === null ?
         '' :
         (new URLSearchParams(location.search).get('filter'))
-    const keyword = (new URLSearchParams(location.search).get('filter')) === null ?
+    const keyword = (new URLSearchParams(location.search).get('keyword')) === null ?
         '' :
-        (new URLSearchParams(location.search).get('filter'))
+        (new URLSearchParams(location.search).get('keyword'))
 
     console.log(currentPage, filter, keyword)
 
     useEffect(() => {
-        console.log('message')
         import('../../redux/fetures/post/postSlice').then((res) => {
-            dispatch(res[request]({ currentPage, filter }))
+            dispatch(res[request]({ currentPage, filter, keyword }))
         }).catch((err) => {
             console.log(err)
         })
-    }, [dispatch, currentPage, filter, request])
+    }, [dispatch, request, currentPage, filter, keyword])
 
     filter = filter === '' ? '-createdAt' : filter
+    console.log(loading)
+
+    if (loading) {
+        return (
+            <div className="w-auto text-xl text-center text-white py-10 mx-auto">
+                Loading...
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-col gap-10 basis-4/5">
@@ -43,10 +49,11 @@ export function Pagination({ request }) {
                 page={page}
                 filter={filter}
                 path={path}
+                keyword={keyword}
             />
 
             {
-                (typeof posts.length === 'number') ? (
+                (typeof posts?.length === 'number') ? (
                     posts?.map((userPost, i) => {
                         return <PostItem
                             key={i}
@@ -65,13 +72,13 @@ export function Pagination({ request }) {
                 )
             }
 
-            <PaginationBottom
+            {!loading && <PaginationBottom
                 page={page}
                 postsNum={postsNum}
                 loading={loading}
                 filter={filter}
                 path={path}
-            />
+            />}
         </div>
     )
 }

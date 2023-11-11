@@ -64,15 +64,14 @@ export function PaginationBottom({ page, postsNum, loading, filter, path }) {
                 </span>
             </div>
         }
-
     }
 
     // IF LOADING OR THERE AREN'T POSTS THEN DON'T RENDER
     if (
-        page &&
+        page !== null &&
         (loading ||
             !postsNum ||
-            (page > pagesNum || page < 1))
+            (+page > pagesNum || +page < 1))
     ) return
 
     return (

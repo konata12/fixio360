@@ -8,8 +8,7 @@ const initialState = {
     // PAGINATION
     postsNum: 0,
     page: null,
-    filter: 'createdAt',
-    filterType: '-',
+    keyWord: '',
     // STATUS
     loading: false,
     status: null,
@@ -63,24 +62,23 @@ export const getAllPosts = createAsyncThunk('post/getAllPosts', async ({ current
     }
 })
 
-export const getMyPosts = createAsyncThunk('post/getMyPosts', async ({ currentPage, filter }) => {
+export const getMyPosts = createAsyncThunk('post/getMyPosts', async ({ currentPage, filter, keyword }) => {
     try {
         let dataRes = []
 
         filter = filter[0] ? filter.replace(/\+/g, '%2B') : filter
         filter = filter ? '&filter=' + filter :
             ''
-
-        console.log(currentPage)
-        console.log(filter)
+        keyword = keyword ? '&keyword=' + keyword :
+        ''
 
         if (currentPage && currentPage !== 'null') {
             console.log(3)
-            const { data } = await Axios.get(`/posts/user/me/?page=${currentPage}${filter}`)
+            const { data } = await Axios.get(`/posts/user/me/?page=${currentPage}${filter}${keyword}`)
             dataRes = data
         } else {
             console.log(4)
-            const { data } = await Axios.get(`/posts/user/me/?${filter.slice(1)}`)
+            const { data } = await Axios.get(`/posts/user/me/?${filter.slice(1)}${keyword}`)
             dataRes = data
         }
         console.log(dataRes)
@@ -99,12 +97,10 @@ export const postSlice = createSlice({
             state.page = action.payload
             console.log(state.page)
         },
-        setFilter: (state, action) => {
-            state.filter = action.payload.replace(/(-|\+)(?=[a-zA-Z])/g, '')
-        },
-        setFilterType: (state, action) => {
-            state.filterType = action.payload.replace(/-|\+/g, action.payload)
-            state.filter = state.filter.replace(/-|\+/g, action.payload)
+        setKeyWord: (state, action) => {
+            console.log(state.keyWord)
+            state.keyWord = action.payload
+            console.log(state.keyWord)
         },
     },
     extraReducers: {
