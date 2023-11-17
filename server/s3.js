@@ -18,28 +18,25 @@ const s3 = new S3({
 })
 
 // uploads a file to s3
-export const uploadFile = (file) => {
+export const uploadFile = (file, pref) => {
     const fileStream = fs.createReadStream(file.path)
-    console.log(bucketName)
-    console.log(fileStream)
-    console.log(file.filename)
 
     const uploadParams = {
         Bucket: bucketName,
         Body: fileStream,
-        Key: file.filename
+        Key: pref + file.filename
     }
 
     return s3.upload(uploadParams).promise()
 }
 
 
-// downloads a file from s3
-export const getFileStream = (fileKey) => {
+// downloads a files from s3
+export const getPaginationFilesStream = (fileKey, prefix) => {
     const downloadParams = {
-        Key: fileKey,
+        prefix: prefix,
         Bucket: bucketName
     }
 
-    return s3.getObject(downloadParams).createReadStream()
+    return s3.ListObjectsV2(downloadParams).createReadStream()
 }

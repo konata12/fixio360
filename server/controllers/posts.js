@@ -2,7 +2,7 @@ import Post from "../models/Post.js";
 import User from "../models/User.js";
 import path, { dirname } from 'path';
 import { fileURLToPath } from "url";
-import { uploadFile } from "../s3.js";
+import { uploadFile, getPaginationFilesStream } from "../s3.js";
 import * as fs from 'fs';
 
 
@@ -17,17 +17,12 @@ export const createPost = async (req, res) => {
         // CREATE POST WITH OMG
         if (image) {
             // UPLOAD IMAGE TO AWS S3
-            console.log(1)
-            try {
-                const result = await uploadFile(image)
-                console.log(result)
-            } catch (err) {
-                console.log(err.message, 1)
-            }
-            console.log(2)
+            await uploadFile(image, 'posts/')
 
             // DELETE IMAGE FROM UPLOADS
+            fs.unlinkSync('./uploads/' + image.filename)
 
+            // CREATE POST WITH IMAGE
             const newPostWithImage = new Post({
                 userName: user.userName,
                 title,
@@ -36,7 +31,9 @@ export const createPost = async (req, res) => {
                 author: req.userId,
             })
 
+            // SAVE POST WITH IMAGE TO MONGO
             await newPostWithImage.save()
+            // ADD POST TO USERS` POSTS ARRAY
             await User.findByIdAndUpdate(req.userId, {
                 $push: { posts: newPostWithImage }
             })
@@ -56,14 +53,16 @@ export const createPost = async (req, res) => {
             author: req.userId,
         })
 
+        // SAVE POST WITHOUT IMAGE TO MONGO
         await newPostWithoutImage.save()
+        // ADD POST TO USERS` POSTS ARRAY
         await User.findByIdAndUpdate(req.userId, {
             $push: { posts: newPostWithoutImage }
         })
 
         res.json({
             newPostWithoutImage,
-            message: 'Створений пост з без картинки'
+            message: 'Створений пост без картинки'
         })
     } catch (err) {
         res.json({
