@@ -5,7 +5,6 @@ import { fileURLToPath } from "url";
 import { uploadFile } from "../s3.js";
 import * as fs from 'fs';
 
-console.log(fs)
 
 // CREATE POST
 export const createPost = async (req, res) => {
@@ -19,8 +18,12 @@ export const createPost = async (req, res) => {
         if (image) {
             // UPLOAD IMAGE TO AWS S3
             console.log(1)
-            const result = await uploadFile(image)
-            console.log(result)
+            try {
+                const result = await uploadFile(image)
+                console.log(result)
+            } catch (err) {
+                console.log(err.message, 1)
+            }
             console.log(2)
 
             // DELETE IMAGE FROM UPLOADS
@@ -29,7 +32,7 @@ export const createPost = async (req, res) => {
                 userName: user.userName,
                 title,
                 text,
-                imgUrl: fileName,
+                imgUrl: image.filename,
                 author: req.userId,
             })
 
