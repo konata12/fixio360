@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 
 export const PostItem = ({ post, avatar }) => {
     const fetching = useSelector(state => state.post?.loading)
-    // console.log(post)
+    console.log(post.imgUrl)
 
     if (fetching) {
         return (
@@ -23,7 +23,7 @@ export const PostItem = ({ post, avatar }) => {
                     post.imgUrl ? 'flex rounded-sm h-80' : 'flex rounded-sm'
                 }>
                     {post?.imgUrl && (
-                        <img src={`http://localhost:3002/post/${post?.imgUrl}`} alt="img" className='object-cover w-full' />
+                        <img src={`http://localhost:3002/uploads/post/${post?.imgUrl}`} alt="img" className='object-cover w-full' />
                     )}
                 </div>
                 <div className='flex justify-between items-center pt-2'>
@@ -37,7 +37,7 @@ export const PostItem = ({ post, avatar }) => {
 
                 {avatar && (<div className='rounded-full w-16 h-16 overflow-hidden'>
                     <img
-                        src={`http://localhost:3002/avatar/${avatar}`}
+                        src={`http://localhost:3002/uploads/avatar/${avatar}`}
                         alt="img"
                         className='w-full' />
                 </div>

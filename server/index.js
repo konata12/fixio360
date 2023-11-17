@@ -3,7 +3,6 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
-import fileUpload from "express-fileupload";
 
 // IMPORT ROUTES
 import authRoute from "./routes/auth.js";
@@ -22,9 +21,7 @@ const DB_NAME = process.env.DB_NAME
 
 // MIDDLEWARE
 app.use(cors())
-app.use(fileUpload())
 app.use(express.json())
-app.use(express.static('uploads'))
 
 // ROUTES
 app.use('/api/auth', authRoute)

@@ -1,15 +1,19 @@
 import { Router } from "express";
 
 // CONTROLLERS
+import { createPost , getAll, getById, updatePost, deleteMyPost, getMyPosts } from "../controllers/posts.js";
 
 // MIDDLEWARE
 import { checkAuth } from "../utils/checkAuth.js";
-import { createPost , getAll, getById, updatePost, deleteMyPost, getMyPosts } from "../controllers/posts.js";
+
+import multer from "multer";
+const upload = multer({ dest: 'uploads/' })
+
 
 const router = new Router()
 
 // CREATE POST
-router.post('/', checkAuth, createPost)
+router.post('/', checkAuth, upload.single('image'), createPost)
 
 // GET ALL POSTS
 router.get('/', getAll)

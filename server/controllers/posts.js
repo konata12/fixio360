@@ -2,26 +2,28 @@ import Post from "../models/Post.js";
 import User from "../models/User.js";
 import path, { dirname } from 'path';
 import { fileURLToPath } from "url";
+import { uploadFile } from "../s3.js";
 import * as fs from 'fs';
+
+console.log(fs)
 
 // CREATE POST
 export const createPost = async (req, res) => {
     try {
         const { title, text } = req.body
         const user = await User.findById(req.userId)
+        const image = req.file
+        console.log(image)
 
         // CREATE POST WITH OMG
-        if (req.files) {
-            let fileName = Date.now().toString() + req.files.image.name
-            // GET CURRENT FOLDER PATH (CONTROLLERS FOLDER)
-            const __dirname = dirname(fileURLToPath(import.meta.url))
-            // CHECKING IF THERE AREN'T SUCH A DIRECTORY, THEN CREATE
-            if (!fs.existsSync('./uploads/post')) {
-                fs.mkdirSync('./uploads/post')
-            }
+        if (image) {
+            // UPLOAD IMAGE TO AWS S3
+            console.log(1)
+            const result = await uploadFile(image)
+            console.log(result)
+            console.log(2)
 
-            // MOVE IMG INTO UPLOADS AND GIVE IT NEW NAME
-            req.files.image.mv(path.join(__dirname, '..', 'uploads', 'post', fileName))
+            // DELETE IMAGE FROM UPLOADS
 
             const newPostWithImage = new Post({
                 userName: user.userName,
@@ -60,10 +62,9 @@ export const createPost = async (req, res) => {
             newPostWithoutImage,
             message: 'Створений пост з без картинки'
         })
-
     } catch (err) {
         res.json({
-            message: 'Щось пішло не так при створенні поста'
+            message: err.message
         })
     }
 }
