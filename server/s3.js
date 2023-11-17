@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import * as fs from 'fs';
 import pkg from 'aws-sdk';
 const { S3 } = pkg;
 
