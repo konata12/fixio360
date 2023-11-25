@@ -9,15 +9,12 @@ export const createPost = async (req, res) => {
     try {
         const { title, text } = req.body
         const user = await User.findById(req.userId)
-        console.log(user)
         const image = req.file
-        console.log(image)
 
         // CREATE POST WITH OMG
         if (image) {
             // UPLOAD IMAGE TO AWS S3
-            const resp = await uploadImg(image, 'posts/')
-            console.log(resp)
+            await uploadImg(image, 'posts/')
 
             // DELETE IMAGE FROM UPLOADS
             fs.unlinkSync('./uploads/' + image.filename)
@@ -118,6 +115,8 @@ export const getAll = async (req, res) => {
                 .skip(skip)
                 .limit(10)
 
+            console.log(posts)
+
             // get posts' signed urls for img
             await Promise.all(posts.map(post => {
                 return new Promise(async (resolve) => {
@@ -151,8 +150,6 @@ export const getAll = async (req, res) => {
 
             // get users
             const users = await User.find({ _id: { $in: postsAuthors } })
-
-            console.log(users)
 
             // get гіукs' signed urls for фмфефк
             await Promise.all(users.map(user => {

@@ -22,7 +22,7 @@ router.post('/login', login)
 router.get('/me', checkAuth, getMe)
 
 // EDIT USER
-router.put('/me', checkAuth, upload.single('image'), editMe)
+router.patch('/me', checkAuth, upload.single('image'), editMe)
 
 // DELETE USER
 router.delete('/me', checkAuth, deleteMe)

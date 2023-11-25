@@ -140,21 +140,21 @@ export const getMe = async (req, res) => {
 export const editMe = async (req, res) => {
     try {
         const { name } = req.body
-        const user = await User.findById(req.userId)
+        let user = await User.findById(req.userId)
         const image = req.file
+        console.log(image.filename)
 
         if (image) {
             // UPLOAD IMAGE TO AWS S3
             await uploadImg(image, 'avatars/')
 
             // DELETE OLD IMAGE FROM AWS S3
-            await deleteImg(user.imgUrl, 'avatars/')
+            if (user.imgUrl !== 'default.jpg') {
+                await deleteImg(user.imgUrl, 'avatars/')
+            }
 
             // DELETE IMAGE FROM UPLOADS
             fs.unlinkSync('./uploads/' + image.filename)
-
-            // CHANGE IMG URL IN MONGO
-            user.imgUrl = image.filename + '.jpg'
         }
 
         const token = jwt.sign(
@@ -167,10 +167,17 @@ export const editMe = async (req, res) => {
             }
         )
 
-        user.userName = name
-        user.save()
+        console.log(user,1)
+        user = await User.findOneAndUpdate({ _id: user._id }, {
+            $set: {
+                userName: name,
+                imgUrl: image.filename + '.jpg'
+            }
+        })
+        console.log(user,2)
 
-        // user.imgUrl = await getUrlFromAWS(user.imgUrl, 'avatars/')
+        user.imgUrl = await getUrlFromAWS(user.imgUrl, 'avatars/')
+        console.log(user,3)
 
         res.json({
             user,
