@@ -1,8 +1,6 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
-import path, { dirname } from 'path';
-import { fileURLToPath } from "url";
-import { uploadFile, getPaginationFilesStream } from "../s3.js";
+import { deleteImg, getUrlFromAWS, uploadImg } from "../s3.js";
 import * as fs from 'fs';
 
 
@@ -11,13 +9,15 @@ export const createPost = async (req, res) => {
     try {
         const { title, text } = req.body
         const user = await User.findById(req.userId)
+        console.log(user)
         const image = req.file
         console.log(image)
 
         // CREATE POST WITH OMG
         if (image) {
             // UPLOAD IMAGE TO AWS S3
-            await uploadFile(image, 'posts/')
+            const resp = await uploadImg(image, 'posts/')
+            console.log(resp)
 
             // DELETE IMAGE FROM UPLOADS
             fs.unlinkSync('./uploads/' + image.filename)
@@ -27,7 +27,7 @@ export const createPost = async (req, res) => {
                 userName: user.userName,
                 title,
                 text,
-                imgUrl: image.filename,
+                imgUrl: image.filename + '.jpg',
                 author: req.userId,
             })
 
@@ -74,7 +74,6 @@ export const createPost = async (req, res) => {
 // GET ALL POSTS
 export const getAll = async (req, res) => {
     try {
-        console.log(req.originalUrl)
         const filter = req.query.filter === undefined ?
             '-createdAt' : req.query.filter
         const page = req.query.page === undefined ?
@@ -92,6 +91,7 @@ export const getAll = async (req, res) => {
             await Post.countDocuments({ title: { '$regex': new RegExp(`${keyword}`) } })
 
         if (page >= 1 && page <= postsNum) {
+            console.log(10)
             // filter
             switch (filter) {
                 case '-createdAt':
@@ -106,18 +106,27 @@ export const getAll = async (req, res) => {
                     return res.json({
                         message: 'There are no such a filter'
                     })
-                    break;
             }
             const anus = filter.slice(1)
             const sort = {}
             sort[anus] = filter[0] === '+' ? 1 : -1
 
-            console.log(page)
-            console.log(sort)
-
             // get posts
             const skip = page > 1 ? ((page - 1) * 10) : 0
-            const posts = await Post.find({ title: { '$regex': new RegExp(`${keyword}`) } }).sort(sort).skip(skip).limit(10)
+            const posts = await Post.find({ title: { '$regex': new RegExp(`${keyword}`) } })
+                .sort(sort)
+                .skip(skip)
+                .limit(10)
+
+            // get posts' signed urls for img
+            await Promise.all(posts.map(post => {
+                return new Promise(async (resolve) => {
+                    const awsUrl = await getUrlFromAWS(post.imgUrl, 'posts/')
+
+                    post.imgUrl = awsUrl
+                    resolve()
+                })
+            }))
 
             // check if there are posts
             if (!posts.length) {
@@ -126,6 +135,7 @@ export const getAll = async (req, res) => {
                 })
             }
 
+            // get array of posts' user ids
             let postsAuthors = await Post.aggregate().sort(`${filter}`)
                 .skip(skip)
                 .limit(10)
@@ -139,8 +149,24 @@ export const getAll = async (req, res) => {
                     console.log(err)
                 })
 
+            // get users
             const users = await User.find({ _id: { $in: postsAuthors } })
 
+            console.log(users)
+
+            // get гіукs' signed urls for фмфефк
+            await Promise.all(users.map(user => {
+                return new Promise(async (resolve) => {
+                    const awsUrl = await getUrlFromAWS(user.imgUrl, 'avatars/')
+
+                    user.imgUrl = awsUrl
+                    resolve()
+                })
+            }))
+
+            console.log(users)
+
+            // combine posts objects with user's avatar
             responsePosts = posts.map(post => {
                 const userUrl = users.map(user => {
                     if (user?._id.toString() === post?.author.toString()) {
@@ -173,8 +199,12 @@ export const getById = async (req, res) => {
         const post = await Post.findByIdAndUpdate(req.params.id, {
             $inc: { views: 1 }
         })
+        const user = await User.findById(post.author)
 
-        res.json(post)
+        post.imgUrl = await getUrlFromAWS(post.imgUrl, 'posts/')
+        const avatar = await getUrlFromAWS(user.imgUrl, 'avatars/')
+
+        res.json({ post, avatar })
     } catch (err) {
         res.json({
             message: 'Something gone wrong'
@@ -186,37 +216,29 @@ export const getById = async (req, res) => {
 export const updatePost = async (req, res) => {
     try {
         const { title, text } = req.body
+        const image = req.file
         const post = await Post.findById(req.params.id)
 
         // CHANGE IMG IF THERE IS ONE
-        if (req.files) {
-            let newImgName = Date.now().toString() + req.files.image.name
+        if (image) {
+            // UPLOAD IMAGE TO AWS S3
+            await uploadImg(image, 'posts/')
 
-            // GET CURRENT FOLDER PATH (CONTROLLERS FOLDER)
-            const __dirname = dirname(fileURLToPath(import.meta.url))
+            // DELETE OLD IMAGE FROM AWS S3
+            await deleteImg(post.imgUrl, 'posts/')
 
-            // CHECKING IF THERE AREN'T SUCH A DIRECTORY, THEN CREATE
-            if (!fs.existsSync('./uploads/post')) {
-                fs.mkdirSync('./uploads/post')
-            }
+            // DELETE IMAGE FROM UPLOADS
+            fs.unlinkSync('./uploads/' + image.filename)
 
-            // DELETE OLD IMG FROM UPLOADS
-            const oldImg = await Post.findById(req.params.id)
-            const oldImgUrl = oldImg.imgUrl
-            console.log(oldImgUrl)
-            if (fs.existsSync('./uploads/post/' + oldImgUrl)) {
-                fs.unlinkSync('./uploads/post/' + oldImgUrl)
-            }
-
-            // MOVE IMG INTO UPLOADS AND GIVE IT NEW NAME
-            req.files.image.mv(path.join(__dirname, '..', 'uploads', 'post', newImgName))
-
-            post.imgUrl = newImgName
+            // CHANGE IMG URL IN MONGO
+            post.imgUrl = image.filename + '.jpg'
         }
+        console.log(image)
 
         // EDIT STRING VALUES
         post.title = title
         post.text = text
+        console.log(post, 1000)
 
         await post.save()
 
@@ -234,7 +256,7 @@ export const updatePost = async (req, res) => {
 // DELETE POST BY ID
 export const deleteMyPost = async (req, res) => {
     try {
-        // DELETE POSTS FROM MONGO
+        // DELETE POST FROM MONGO
         const post = await Post.findByIdAndRemove(req.params.id)
         if (!post) return res.join({
             message: 'There are no such a post'
@@ -245,17 +267,15 @@ export const deleteMyPost = async (req, res) => {
             $pull: { posts: req.params.id }
         })
 
-        // DELETE IMG FROM UPLOADS
-        let fileName = post.imgUrl
-        fs.unlinkSync('./uploads/post/' + fileName)
+        // DELETE IMG FROM s3
+        await deleteImg(post.imgUrl, 'posts/')
 
         res.json({
             message: 'Post was deleted'
         })
     } catch (err) {
-        res.json({
-            message: 'Something gone wrong'
-        })
+        console.log(err.message)
+        res.json(err.message)
     }
 }
 
@@ -270,8 +290,6 @@ export const getMyPosts = async (req, res) => {
             1 : +req.query.page
         const keyword = req.query.keyword === undefined ?
             '' : req.query.keyword
-
-        console.log(keyword.length, 'slovo')
 
         // counting this author posts by keywords
         const postsNum = await Post.countDocuments({
@@ -307,16 +325,27 @@ export const getMyPosts = async (req, res) => {
                 .skip(skip)
                 .limit(10)
 
-            responsePosts = {
-                avatarUrl: user.imgUrl,
-                posts: responsePosts
-            }
-
             // check if there are posts
-            if (!responsePosts.posts.length) {
+            if (!responsePosts.length) {
                 return res.json({
                     message: 'There are no posts'
                 })
+            }
+
+            // get posts' url for image from s3
+            await Promise.all(responsePosts.map(post => {
+                return new Promise(async (resolve) => {
+                    const awsUrl = await getUrlFromAWS(post.imgUrl, 'posts/')
+
+                    post.imgUrl = awsUrl
+                    resolve()
+                })
+            }))
+
+            // build response
+            responsePosts = {
+                avatarUrl: await getUrlFromAWS(user.imgUrl, 'avatars/'),
+                posts: responsePosts
             }
         }
 
@@ -325,6 +354,7 @@ export const getMyPosts = async (req, res) => {
             postsNum
         })
     } catch (err) {
+        console.log(err.message)
         res.json(err.message)
     }
 }

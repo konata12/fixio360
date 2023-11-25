@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom'
 
 export const PostItem = ({ post, avatar }) => {
     const fetching = useSelector(state => state.post?.loading)
-    console.log(post.imgUrl)
 
     if (fetching) {
         return (
@@ -17,46 +16,45 @@ export const PostItem = ({ post, avatar }) => {
     }
 
     return (
-        <Link to={`/${post._id}`}>
+        <Link to={`/${post?._id}`}>
             <div className='flex flex-col basis-1/4 flex-grow'>
                 <div className={
-                    post.imgUrl ? 'flex rounded-sm h-80' : 'flex rounded-sm'
+                    post?.imgUrl ? 'flex rounded-sm h-80' : 'flex rounded-sm'
                 }>
                     {post?.imgUrl && (
-                        <img src={`http://localhost:3002/uploads/post/${post?.imgUrl}`} alt="img" className='object-cover w-full' />
+                        <img src={`${post?.imgUrl}`} alt="img" className='object-cover w-full' />
                     )}
                 </div>
                 <div className='flex justify-between items-center pt-2'>
                     <div className='text-xs text-white opacity-50'>
-                        {post.username}
+                        {post?.username}
                     </div>
                     <div className='text-xs text-white opacity-50'>
-                        <Moment date={post.createdAt} format='D MMM YYYY' />
+                        <Moment date={post?.createdAt} format='D MMM YYYY' />
                     </div>
                 </div>
 
-                {avatar && (<div className='rounded-full w-16 h-16 overflow-hidden'>
+                <div className='rounded-full w-16 h-16 overflow-hidden'>
                     <img
-                        src={`http://localhost:3002/uploads/avatar/${avatar}`}
+                        src={`${avatar}`}
                         alt="img"
                         className='w-full' />
                 </div>
-                )}
 
                 <div className="text-white text-xl">
-                    {post.title}
+                    {post?.title}
                 </div>
 
                 <p className='text-white opacity-60 text-xs pt-4'>
-                    {post.text}
+                    {post?.text}
                 </p>
 
                 <div className="flex gap-3 items-center mt-2">
                     <button className='flex items-center justify-center gap-2 text-xs text-white opacity-50'>
-                        <AiFillEye /> <span>{post.views}</span>
+                        <AiFillEye /> <span>{post?.views}</span>
                     </button>
                     <button className='flex items-center justify-center gap-2 text-xs text-white opacity-50'>
-                        <AiOutlineMessage /> <span>{post.comments?.length || 0}</span>
+                        <AiOutlineMessage /> <span>{post?.comments?.length || 0}</span>
                     </button>
                 </div>
             </div>

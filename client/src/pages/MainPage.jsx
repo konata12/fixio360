@@ -5,6 +5,7 @@ import { Pagination } from '../components/pagination/Pagination'
 
 export const MainPage = () => {
     const { loading, popularPosts } = useSelector(state => state.post)
+    console.log(2222222222)
 
     return (
         <div className='max-w-[900px] mx-auto py-10'>

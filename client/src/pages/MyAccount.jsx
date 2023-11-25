@@ -6,13 +6,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { editMe, logout } from '../redux/fetures/auth/authSlice.js'
 
 
-
 export function MyAccount() {
     const [edit, setEdit] = useState(false)
     const [name, setName] = useState('')
     const [oldAvatar, setOldAvatar] = useState('')
     const [newAvatar, setNewAvatar] = useState('')
-
     
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -38,16 +36,13 @@ export function MyAccount() {
         console.log('delete')
     }
 
-    // const clearFormHandler = () => {
-    //     setName('')
-    //     setNewAvatar('')
-    //     setOldAvatar(user?.imgUrl)
-    // }
-
     useEffect(() => {
         setName(user?.userName)
         setOldAvatar(user?.imgUrl)
     }, [user?.userName, user?.imgUrl])
+
+    console.log(newAvatar)
+    console.log(user)
 
     return (
         <div>
@@ -81,17 +76,17 @@ export function MyAccount() {
                         </label>
                         <div className='flex object-cover py-2'>
                             {oldAvatar && (
-                                <img src={`http://localhost:3002/avatar/${oldAvatar}`} alt={oldAvatar.name} />
+                                <img src={oldAvatar} alt={'negru'} />
                             )}
                             {newAvatar && (
-                                <img src={URL.createObjectURL(newAvatar)} alt={newAvatar.name} />
+                                <img src={URL.createObjectURL(newAvatar)} alt={'jopa'} />
                             )}
                         </div>
 
                         <label
                             className="text-xs text-white opacity-70"
                         >
-                            Назва посту:
+                            Змінити ім'я
                             <input
                                 type="text"
                                 value={name}
@@ -120,7 +115,7 @@ export function MyAccount() {
                     <div className='flex flex-col basis-1/5'>
                         {user?.imgUrl && <img
                             className='rounded-full'
-                            src={`http://localhost:3002/avatar/${user?.imgUrl}`}
+                            src={user?.imgUrl}
                             alt="img"
                         />}
                         <div className="text-white text-xl">

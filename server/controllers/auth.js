@@ -3,9 +3,9 @@ import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import path, { dirname } from 'path';
-import { fileURLToPath } from "url";
 import * as fs from 'fs';
+import { deleteImg, getUrlFromAWS, uploadImg } from "../s3.js";
+
 
 // REGISTER USER
 export const register = async (req, res) => {
@@ -111,6 +111,9 @@ export const getMe = async (req, res) => {
             })
         }
 
+        // get avatar url from aws
+        user.imgUrl = await getUrlFromAWS(user.imgUrl, 'avatars/')
+
         const token = jwt.sign(
             {
                 id: user._id
@@ -138,27 +141,20 @@ export const editMe = async (req, res) => {
     try {
         const { name } = req.body
         const user = await User.findById(req.userId)
+        const image = req.file
 
-        if (req.files) {
-            let fileName = Date.now().toString() + req.files.image.name
+        if (image) {
+            // UPLOAD IMAGE TO AWS S3
+            await uploadImg(image, 'avatars/')
 
-            // GET CURRENT FOLDER PATH (CONTROLLERS FOLDER)
-            const __dirname = dirname(fileURLToPath(import.meta.url))
+            // DELETE OLD IMAGE FROM AWS S3
+            await deleteImg(user.imgUrl, 'avatars/')
 
-            // DELETING OLD IMG FROM UPLOADS
-            if (user.imgUrl) {
-                fs.unlinkSync('./uploads/avatar/' + user.imgUrl)
-            }
+            // DELETE IMAGE FROM UPLOADS
+            fs.unlinkSync('./uploads/' + image.filename)
 
-            // CHECKING IF THERE AREN'T SUCH A DIRECTORY, THEN CREATE
-            if (!fs.existsSync('./uploads/avatar')) {
-                fs.mkdirSync('./uploads/avatar')
-            }
-
-            // MOVE IMG INTO UPLOADS AND GIVE IT NEW NAME
-            req.files.image.mv(path.join(__dirname, '..', 'uploads', 'avatar', fileName))
-
-            user.imgUrl = fileName
+            // CHANGE IMG URL IN MONGO
+            user.imgUrl = image.filename + '.jpg'
         }
 
         const token = jwt.sign(
@@ -172,8 +168,9 @@ export const editMe = async (req, res) => {
         )
 
         user.userName = name
-
         user.save()
+
+        // user.imgUrl = await getUrlFromAWS(user.imgUrl, 'avatars/')
 
         res.json({
             user,

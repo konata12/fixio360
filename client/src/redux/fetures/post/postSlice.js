@@ -114,6 +114,7 @@ export const postSlice = createSlice({
             action.payload.newPostWithImage ?
                 state.posts.push(action.payload.newPostWithImage) :
                 state.posts.push(action.payload.newPostWithoutImage)
+                console.log(11111111111)
             state.status = action.payload.message
         },
         [createPost.rejected]: (state, action) => {

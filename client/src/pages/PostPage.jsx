@@ -10,6 +10,7 @@ import { CommentItem } from '../components/CommentItem.jsx'
 
 export const PostPage = () => {
     const [post, setPost] = useState(null)
+    const [avatar, setAvatar] = useState(null)
     const [comment, setComment] = useState('')
 
     const params = useParams()
@@ -21,7 +22,8 @@ export const PostPage = () => {
     const fetchPost = useCallback(async () => {
         try {
             const { data } = await Axios.get(`/posts/${params.id}`)
-            setPost(data)
+            setPost(data.post)
+            setAvatar(data.avatar)
         } catch (err) {
             console.log(err)
         }
@@ -88,7 +90,7 @@ export const PostPage = () => {
                         >
                             {post?.imgUrl && (
                                 <img
-                                    src={`http://localhost:3002/post/${post?.imgUrl}`}
+                                    src={post?.imgUrl}
                                     alt="img"
                                     className='object-cover w-full'
                                 />
@@ -102,6 +104,13 @@ export const PostPage = () => {
                             <div className='text-xs text-white opacity-50'>
                                 <Moment date={post?.createdAt} format='D MMM YYYY' />
                             </div>
+                        </div>
+
+                        <div className='rounded-full w-16 h-16 overflow-hidden'>
+                            <img
+                                src={`${avatar}`}
+                                alt="img"
+                                className='w-full' />
                         </div>
 
                         <div className="text-white text-xl">

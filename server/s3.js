@@ -18,25 +18,37 @@ const s3 = new S3({
 })
 
 // uploads a file to s3
-export const uploadFile = (file, pref) => {
+export const uploadImg = (file, pref) => {
     const fileStream = fs.createReadStream(file.path)
 
     const uploadParams = {
         Bucket: bucketName,
         Body: fileStream,
-        Key: pref + file.filename
+        Key: pref + file.filename + '.jpg'
     }
 
     return s3.upload(uploadParams).promise()
 }
 
-
 // downloads a files from s3
-export const getPaginationFilesStream = (fileKey, prefix) => {
-    const downloadParams = {
-        prefix: prefix,
-        Bucket: bucketName
+export const getUrlFromAWS = async (fileKey, prefix) => {
+    const presignedURL = await s3.getSignedUrlPromise('getObject', {
+        Bucket: bucketName,
+        Key: prefix + fileKey, //filename
+        Expires: 100 //time to expire in seconds
+    });
+
+    console.log('getting url')
+
+    return presignedURL
+}
+
+// delete file from s3
+export const deleteImg = (fileName, pref) => {
+    const deleteParams = {
+        Bucket: bucketName,
+        Key: pref + fileName
     }
 
-    return s3.ListObjectsV2(downloadParams).createReadStream()
+    return s3.deleteObject(deleteParams).promise()
 }

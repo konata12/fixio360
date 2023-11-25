@@ -22,7 +22,7 @@ router.get('/', getAll)
 router.get('/:id', getById)
 
 // UPDATE POST
-router.put('/:id', checkAuth, updatePost)
+router.put('/:id', checkAuth, upload.single('image'), updatePost)
 
 // DELETE POST BY ID
 router.delete('/:id', checkAuth, deleteMyPost)
