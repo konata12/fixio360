@@ -41,8 +41,11 @@ export function MyAccount() {
         setOldAvatar(user?.imgUrl)
     }, [user?.userName, user?.imgUrl])
 
-    console.log(newAvatar)
-    console.log(user)
+    console.log('new avatar:',newAvatar)
+    // console.log(URL.createObjectURL(newAvatar))
+    console.log('user:',user)
+    console.log('img:', user?.imgUrl)
+    console.log('*****************************')
 
     return (
         <div>
@@ -54,6 +57,8 @@ export function MyAccount() {
                     Back
                 </Link>
             </button>
+
+            <img src={user?.imgUrl} alt="ya ebav" />
 
             <div className="flex gap-10 py-8">
                 {edit ? (

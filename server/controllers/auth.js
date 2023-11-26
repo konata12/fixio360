@@ -143,6 +143,8 @@ export const editMe = async (req, res) => {
         let user = await User.findById(req.userId)
         const image = req.file
         console.log(image.filename)
+        console.log(req.userId)
+        console.log(user)
 
         if (image) {
             // UPLOAD IMAGE TO AWS S3
@@ -168,7 +170,7 @@ export const editMe = async (req, res) => {
         )
 
         console.log(user,1)
-        user = await User.findOneAndUpdate({ _id: user._id }, {
+        await User.findOneAndUpdate({ _id: user._id }, {
             $set: {
                 userName: name,
                 imgUrl: image.filename + '.jpg'
@@ -177,6 +179,7 @@ export const editMe = async (req, res) => {
         console.log(user,2)
 
         user.imgUrl = await getUrlFromAWS(user.imgUrl, 'avatars/')
+        user.userName = name
         console.log(user,3)
 
         res.json({
@@ -185,9 +188,7 @@ export const editMe = async (req, res) => {
         })
     } catch (err) {
         console.log(err)
-        res.json({
-            message: 'Не вдалось оновити інформацію'
-        })
+        res.json(err.message)
     }
 }
 

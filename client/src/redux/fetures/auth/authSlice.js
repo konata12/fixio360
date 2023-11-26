@@ -68,7 +68,9 @@ export const getMe = createAsyncThunk('auth/get', async () => {
 
 export const editMe = createAsyncThunk('auth/get', async (params) => {
         try {
-            const { data } = await Axios.put('/auth/me', params)
+            const { data } = await Axios.patch('/auth/me', params)
+            
+            console.log(data)
 
             return data
         } catch (err) {
